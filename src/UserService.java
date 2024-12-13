@@ -1,179 +1,185 @@
 package src;
 
 import java.util.Map;
-import java.util.Scanner;
+
+import javax.swing.JLabel;
 
 public interface UserService {
-    void register();
+    void login(String username, String password, JLabel errorLabel);
 
-    void login();
+    default void displayErrorMessage(String errorMsg, JLabel errorLabel) {
+        errorLabel.setText(errorMsg);
+    }
 
-    default boolean validateCharLength(String field, String input, Map<String, Integer> columnLengths,
-            DatabaseHandler dbHandler) {
+    default boolean validateAndSetError(String errorMsg, JLabel errorLabel) {
+        if (!errorMsg.isEmpty()) {
+            displayErrorMessage(errorMsg, errorLabel);
+            return false;
+        }
+        return true;
+    }
+
+    default String validateHasCharacters(String field, String input) {
+        if (input.isEmpty()) {
+            return Utils.capitalize(field.replace('_', ' ')) + " is empty.";
+        }
+        return "";
+    }
+
+    default String validateCharLength(String field, String input, Map<String, Integer> columnLengths) {
         if (input.length() > columnLengths.get(field)) {
-            System.out.println("Error: " + field + " exceeds maximum length of " + columnLengths.get(field));
-            return false;
+            return Utils.capitalize(field.replace('_', ' ')) + " exceeds maximum length of "
+                    + columnLengths.get(field);
         }
-        return true;
+        return "";
     }
 
-    default boolean validateUsernameTaken(String input, DatabaseHandler dbHandler, String userType) {
+    default String validateUsernameTaken(String input, DatabaseHandler dbHandler, String userType) {
         if (dbHandler.isUsernameTaken(input, userType)) {
-            System.out.println("Error: Username already exists.");
-            return false;
+            return "Username already exists.";
         }
-        return true;
+        return "";
     }
 
-    default boolean validateUsernameCharacters(String input) {
+    default String validateUsernameCharacters(String input) {
         if (!input.matches("^[a-zA-Z0-9_]+$")) {
-            System.out.println("Error: Username can only contain letters, numbers, and underscores.");
-            return false;
+            return "Username can only contain letters, numbers, and underscores.";
         }
-        return true;
+        return "";
     }
 
-    default boolean validateContactCharacters(String input) {
+    default String validateContactCharacters(String input) {
         if (!input.matches("^[0-9+]+$")) {
-            System.out.println("Error: Contact number must only contain digits.");
-            return false;
+            return "Contact number must only contain digits.";
         }
-        return true;
+        return "";
     }
 
     @SuppressWarnings("resource")
-    default void handleLogin(DatabaseHandler dbHandler, String userType) {
-        System.out.println("\n--- Log in as " + userType + " ---");
-        Scanner scanner = new Scanner(System.in);
+    default void handleLogin(DatabaseHandler dbHandler, String userType, String username, String password,
+            JLabel errorLabel) {
 
-        System.out.print("Enter username: ");
-        String username = scanner.nextLine();
-
-        System.out.print("Enter password: ");
-        String password = scanner.nextLine();
+        if (!validateAndSetError(validateHasCharacters("username", username), errorLabel))
+            return;
+        if (!validateAndSetError(validateHasCharacters("password", password), errorLabel))
+            return;
 
         if (dbHandler.verifyLogin(username, password, userType)) {
             System.out.println(userType + " login successful. Welcome, " + username + "!");
+            errorLabel.setText("");
+            // Add function for proceeding to landing page
         } else {
-            System.out.println("Invalid username or password. Please try again.");
-        }
-    }
-}
-
-class SellerService implements UserService {
-    private final SellerDatabaseHandler sellerDbHandler;
-    private final DatabaseHandler dbHandler;
-    private final String TABLE_NAME = "Seller";
-
-    public SellerService(DatabaseHandler dbHandler) {
-        this.dbHandler = dbHandler;
-        this.sellerDbHandler = new SellerDatabaseHandler();
-    }
-
-    @SuppressWarnings("resource")
-    @Override
-    public void register() {
-        System.out.println("\n--- Register as Seller ---");
-        Scanner scanner = new Scanner(System.in);
-
-        Map<String, Integer> columnLengths = dbHandler.getColumnMaxLengths(TABLE_NAME);
-
-        System.out.print("Enter username: ");
-        String username = scanner.nextLine();
-        if (!validateCharLength("username", username, columnLengths, dbHandler))
-            return;
-        if (!validateUsernameTaken(username, dbHandler, TABLE_NAME))
-            return;
-        if (!validateUsernameCharacters(username))
-            return;
-
-        System.out.print("Enter display name: ");
-        String displayName = scanner.nextLine();
-        if (!validateCharLength("display_name", displayName, columnLengths, dbHandler))
-            return;
-
-        System.out.print("Enter password: ");
-        String password = scanner.nextLine();
-        if (!validateCharLength("password", password, columnLengths, dbHandler))
-            return;
-
-        System.out.print("Enter address: ");
-        String address = scanner.nextLine();
-        if (!validateCharLength("address", address, columnLengths, dbHandler))
-            return;
-
-        System.out.print("Enter contact number: ");
-        String contactNumber = scanner.nextLine();
-        if (!validateCharLength("contact_number", contactNumber, columnLengths, dbHandler))
-            return;
-        if (!validateContactCharacters(contactNumber))
-            return;
-
-        if (sellerDbHandler.registerSeller(username, displayName, password, address, contactNumber)) {
-            System.out.println("Seller registration successful.");
-        } else {
-            System.out.println("Seller registration failed.");
+            displayErrorMessage("Invalid username or password. Please try again.", errorLabel);
         }
     }
 
-    @Override
-    public void login() {
-        handleLogin(dbHandler, "Seller");
-    }
-}
+    public static class SellerService implements UserService {
+        private final SellerDatabaseHandler sellerDbHandler;
+        private final DatabaseHandler dbHandler;
+        private final String TABLE_NAME = "Seller";
 
-class BuyerService implements UserService {
-    private final BuyerDatabaseHandler buyerDbHandler;
-    private final DatabaseHandler dbHandler;
-    private final String TABLE_NAME = "Buyer";
+        public SellerService(DatabaseHandler dbHandler) {
+            this.dbHandler = dbHandler;
+            this.sellerDbHandler = new SellerDatabaseHandler();
+        }
 
-    public BuyerService(DatabaseHandler dbHandler) {
-        this.dbHandler = dbHandler;
-        this.buyerDbHandler = new BuyerDatabaseHandler();
-    }
+        public void register(String username, String displayName, String password, String address,
+                String contactNumber, JLabel errorLabel) {
+            Map<String, Integer> columnLengths = dbHandler.getColumnMaxLengths(TABLE_NAME);
 
-    @SuppressWarnings("resource")
-    @Override
-    public void register() {
-        System.out.println("\n--- Register as Buyer ---");
-        Scanner scanner = new Scanner(System.in);
+            if (!validateAndSetError(validateHasCharacters("username", username), errorLabel))
+                return;
+            if (!validateAndSetError(validateCharLength("username", username, columnLengths), errorLabel))
+                return;
+            if (!validateAndSetError(validateUsernameTaken(username, dbHandler, TABLE_NAME), errorLabel))
+                return;
+            if (!validateAndSetError(validateUsernameCharacters(username), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasCharacters("display_name", displayName), errorLabel))
+                return;
+            if (!validateAndSetError(validateCharLength("display_name", displayName, columnLengths), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasCharacters("password", password), errorLabel))
+                return;
+            if (!validateAndSetError(validateCharLength("password", password, columnLengths), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasCharacters("address", address), errorLabel))
+                return;
+            if (!validateAndSetError(validateCharLength("address", address, columnLengths), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasCharacters("contact_number", contactNumber), errorLabel))
+                return;
+            if (!validateAndSetError(validateCharLength("contact_number", contactNumber, columnLengths), errorLabel))
+                return;
+            if (!validateAndSetError(validateContactCharacters(contactNumber), errorLabel))
+                return;
 
-        Map<String, Integer> columnLengths = dbHandler.getColumnMaxLengths(TABLE_NAME);
+            if (sellerDbHandler.registerSeller(username, displayName, password, address, contactNumber)) {
+                System.out.println("Seller registration successful.");
+                // Add function for proceeding to login page
+            } else {
+                displayErrorMessage("Seller registration failed.", errorLabel);
+            }
+        }
 
-        System.out.print("Enter username: ");
-        String username = scanner.nextLine();
-        if (!validateCharLength("username", username, columnLengths, dbHandler))
-            return;
-
-        System.out.print("Enter display name: ");
-        String displayName = scanner.nextLine();
-        if (!validateCharLength("display_name", displayName, columnLengths, dbHandler))
-            return;
-
-        System.out.print("Enter password: ");
-        String password = scanner.nextLine();
-        if (!validateCharLength("password", password, columnLengths, dbHandler))
-            return;
-
-        System.out.print("Enter address: ");
-        String address = scanner.nextLine();
-        if (!validateCharLength("address", address, columnLengths, dbHandler))
-            return;
-
-        System.out.print("Enter contact number: ");
-        String contactNumber = scanner.nextLine();
-        if (!validateCharLength("contact_number", contactNumber, columnLengths, dbHandler))
-            return;
-
-        if (buyerDbHandler.registerBuyer(username, displayName, password, address, contactNumber)) {
-            System.out.println("Buyer registration successful.");
-        } else {
-            System.out.println("Buyer registration failed.");
+        @Override
+        public void login(String username, String password, JLabel errorLabel) {
+            handleLogin(dbHandler, "Seller", username, password, errorLabel);
         }
     }
 
-    @Override
-    public void login() {
-        handleLogin(dbHandler, "Buyer");
+    public static class BuyerService implements UserService {
+        private final BuyerDatabaseHandler buyerDbHandler;
+        private final DatabaseHandler dbHandler;
+        private final String TABLE_NAME = "Buyer";
+
+        public BuyerService(DatabaseHandler dbHandler) {
+            this.dbHandler = dbHandler;
+            this.buyerDbHandler = new BuyerDatabaseHandler();
+        }
+
+        public void register(String username, String displayName, String password, String address,
+                String contactNumber, JLabel errorLabel) {
+            Map<String, Integer> columnLengths = dbHandler.getColumnMaxLengths(TABLE_NAME);
+
+            if (!validateAndSetError(validateHasCharacters("username", username), errorLabel))
+                return;
+            if (!validateAndSetError(validateCharLength("username", username, columnLengths), errorLabel))
+                return;
+            if (!validateAndSetError(validateUsernameTaken(username, dbHandler, TABLE_NAME), errorLabel))
+                return;
+            if (!validateAndSetError(validateUsernameCharacters(username), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasCharacters("display_name", displayName), errorLabel))
+                return;
+            if (!validateAndSetError(validateCharLength("display_name", displayName, columnLengths), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasCharacters("password", password), errorLabel))
+                return;
+            if (!validateAndSetError(validateCharLength("password", password, columnLengths), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasCharacters("address", address), errorLabel))
+                return;
+            if (!validateAndSetError(validateCharLength("address", address, columnLengths), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasCharacters("contact_number", contactNumber), errorLabel))
+                return;
+            if (!validateAndSetError(validateCharLength("contact_number", contactNumber, columnLengths), errorLabel))
+                return;
+            if (!validateAndSetError(validateContactCharacters(contactNumber), errorLabel))
+                return;
+
+            if (buyerDbHandler.registerBuyer(username, displayName, password, address, contactNumber)) {
+                System.out.println("Buyer registration successful.");
+                // Add function for proceeding to login page
+            } else {
+                displayErrorMessage("Buyer registration failed.", errorLabel);
+            }
+        }
+
+        @Override
+        public void login(String username, String password, JLabel errorLabel) {
+            handleLogin(dbHandler, "Buyer", username, password, errorLabel);
+        }
     }
 }
