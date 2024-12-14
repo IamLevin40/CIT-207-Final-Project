@@ -1,11 +1,22 @@
 package src;
 
 import java.util.Map;
+import java.util.regex.*;
 
 import javax.swing.JLabel;
 
+import utils.Utils;
+
 public interface UserService {
-    void login(String username, String password, JLabel errorLabel);
+    interface LoginCallback {
+        void onSuccess();
+    }
+
+    interface RegisterCallback {
+        void onSuccess();
+    }
+
+    void login(String username, String password, JLabel errorLabel, LoginCallback callback);
 
     default void displayErrorMessage(String errorMsg, JLabel errorLabel) {
         errorLabel.setText(errorMsg);
@@ -26,10 +37,49 @@ public interface UserService {
         return "";
     }
 
-    default String validateCharLength(String field, String input, Map<String, Integer> columnLengths) {
+    default String validateHasSelectedOption(String field, String input) {
+        if (input.isEmpty()) {
+            return Utils.capitalize(field.replace('_', ' ')) + " has no selected option.";
+        }
+        return "";
+    }
+
+    default String validateExceedCharLength(String field, String input, Map<String, Integer> columnLengths) {
         if (input.length() > columnLengths.get(field)) {
-            return Utils.capitalize(field.replace('_', ' ')) + " exceeds maximum length of "
-                    + columnLengths.get(field);
+            return Utils.capitalize(field.replace('_', ' ')) + " exceeds maximum length of " + columnLengths.get(field)
+                    + " characters.";
+        }
+        return "";
+    }
+
+    default String validateExactCharLength(String field, String input, Map<String, Integer> columnLengths) {
+        if (input.length() != columnLengths.get(field)) {
+            return Utils.capitalize(field.replace('_', ' ')) + " must contain exactly " + columnLengths.get(field)
+                    + " characters.";
+        }
+        return "";
+    }
+
+    default String validateOnlyAlphanumericCharacters(String field, String input) {
+        if (!input.matches("^[a-zA-Z0-9_]+$")) {
+            return Utils.capitalize(field.replace('_', ' ')) + " can only contain letters, numbers, and underscores.";
+        }
+        return "";
+    }
+
+    default String validateOnlyDigitCharacters(String field, String input) {
+        if (!input.matches("^[0-9]+$")) {
+            return Utils.capitalize(field.replace('_', ' ')) + " must only contain digits.";
+        }
+        return "";
+    }
+
+    default String validateEmail(String input) {
+        final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+        Matcher matcher = pattern.matcher(input);
+        if (!matcher.matches()) {
+            return "Not a valid email";
         }
         return "";
     }
@@ -41,23 +91,9 @@ public interface UserService {
         return "";
     }
 
-    default String validateUsernameCharacters(String input) {
-        if (!input.matches("^[a-zA-Z0-9_]+$")) {
-            return "Username can only contain letters, numbers, and underscores.";
-        }
-        return "";
-    }
-
-    default String validateContactCharacters(String input) {
-        if (!input.matches("^[0-9+]+$")) {
-            return "Contact number must only contain digits.";
-        }
-        return "";
-    }
-
     @SuppressWarnings("resource")
     default void handleLogin(DatabaseHandler dbHandler, String userType, String username, String password,
-            JLabel errorLabel) {
+            JLabel errorLabel, LoginCallback callback) {
 
         if (!validateAndSetError(validateHasCharacters("username", username), errorLabel))
             return;
@@ -67,7 +103,7 @@ public interface UserService {
         if (dbHandler.verifyLogin(username, password, userType)) {
             System.out.println(userType + " login successful. Welcome, " + username + "!");
             errorLabel.setText("");
-            // Add function for proceeding to landing page
+            callback.onSuccess();
         } else {
             displayErrorMessage("Invalid username or password. Please try again.", errorLabel);
         }
@@ -83,48 +119,72 @@ public interface UserService {
             this.sellerDbHandler = new SellerDatabaseHandler();
         }
 
-        public void register(String username, String displayName, String password, String address,
-                String contactNumber, JLabel errorLabel) {
+        public void register(String lastName, String firstName, String username, String password, String email,
+                String contactNumber, String region, String cityOrMunicipality, String barangay, String zipCode,
+                JLabel errorLabel, RegisterCallback callback) {
             Map<String, Integer> columnLengths = dbHandler.getColumnMaxLengths(TABLE_NAME);
 
+            if (!validateAndSetError(validateHasCharacters("last_name", lastName), errorLabel))
+                return;
+            if (!validateAndSetError(validateExceedCharLength("last_name", lastName, columnLengths), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasCharacters("first_name", firstName), errorLabel))
+                return;
+            if (!validateAndSetError(validateExceedCharLength("first_name", firstName, columnLengths), errorLabel))
+                return;
             if (!validateAndSetError(validateHasCharacters("username", username), errorLabel))
                 return;
-            if (!validateAndSetError(validateCharLength("username", username, columnLengths), errorLabel))
+            if (!validateAndSetError(validateExceedCharLength("username", username, columnLengths), errorLabel))
                 return;
             if (!validateAndSetError(validateUsernameTaken(username, dbHandler, TABLE_NAME), errorLabel))
                 return;
-            if (!validateAndSetError(validateUsernameCharacters(username), errorLabel))
-                return;
-            if (!validateAndSetError(validateHasCharacters("display_name", displayName), errorLabel))
-                return;
-            if (!validateAndSetError(validateCharLength("display_name", displayName, columnLengths), errorLabel))
+            if (!validateAndSetError(validateOnlyAlphanumericCharacters("username", username), errorLabel))
                 return;
             if (!validateAndSetError(validateHasCharacters("password", password), errorLabel))
                 return;
-            if (!validateAndSetError(validateCharLength("password", password, columnLengths), errorLabel))
+            if (!validateAndSetError(validateExceedCharLength("password", password, columnLengths), errorLabel))
                 return;
-            if (!validateAndSetError(validateHasCharacters("address", address), errorLabel))
+            if (!validateAndSetError(validateHasCharacters("email", email), errorLabel))
                 return;
-            if (!validateAndSetError(validateCharLength("address", address, columnLengths), errorLabel))
+            if (!validateAndSetError(validateEmail(email), errorLabel))
+                return;
+            if (!validateAndSetError(validateExceedCharLength("email", email, columnLengths), errorLabel))
                 return;
             if (!validateAndSetError(validateHasCharacters("contact_number", contactNumber), errorLabel))
                 return;
-            if (!validateAndSetError(validateCharLength("contact_number", contactNumber, columnLengths), errorLabel))
+            if (!validateAndSetError(validateOnlyDigitCharacters("contact_number", contactNumber), errorLabel))
                 return;
-            if (!validateAndSetError(validateContactCharacters(contactNumber), errorLabel))
+            if (!validateAndSetError(validateExactCharLength("contact_number", contactNumber, columnLengths),
+                    errorLabel))
+                return;
+            if (!validateAndSetError(validateHasSelectedOption("region", region), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasSelectedOption("city_or_municipality", cityOrMunicipality), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasCharacters("barangay", barangay), errorLabel))
+                return;
+            if (!validateAndSetError(validateExceedCharLength("barangay", barangay, columnLengths), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasCharacters("zip_code", zipCode), errorLabel))
+                return;
+            if (!validateAndSetError(validateOnlyDigitCharacters("zip_code", zipCode), errorLabel))
+                return;
+            if (!validateAndSetError(validateExactCharLength("zip_code", zipCode, columnLengths),
+                    errorLabel))
                 return;
 
-            if (sellerDbHandler.registerSeller(username, displayName, password, address, contactNumber)) {
+            if (sellerDbHandler.registerSeller(username, lastName, firstName, password, email, contactNumber, region,
+                    cityOrMunicipality, barangay, zipCode)) {
                 System.out.println("Seller registration successful.");
-                // Add function for proceeding to login page
+                callback.onSuccess();
             } else {
                 displayErrorMessage("Seller registration failed.", errorLabel);
             }
         }
 
         @Override
-        public void login(String username, String password, JLabel errorLabel) {
-            handleLogin(dbHandler, "Seller", username, password, errorLabel);
+        public void login(String username, String password, JLabel errorLabel, LoginCallback callback) {
+            handleLogin(dbHandler, "Seller", username, password, errorLabel, callback);
         }
     }
 
@@ -138,48 +198,69 @@ public interface UserService {
             this.buyerDbHandler = new BuyerDatabaseHandler();
         }
 
-        public void register(String username, String displayName, String password, String address,
-                String contactNumber, JLabel errorLabel) {
+        public void register(String organizationName, String username, String password, String email,
+                String contactNumber, String region, String cityOrMunicipality, String barangay, String zipCode,
+                JLabel errorLabel, RegisterCallback callback) {
             Map<String, Integer> columnLengths = dbHandler.getColumnMaxLengths(TABLE_NAME);
 
+            if (!validateAndSetError(validateHasCharacters("organization_name", organizationName), errorLabel))
+                return;
+            if (!validateAndSetError(validateExceedCharLength("organization_name", organizationName, columnLengths),
+                    errorLabel))
+                return;
             if (!validateAndSetError(validateHasCharacters("username", username), errorLabel))
                 return;
-            if (!validateAndSetError(validateCharLength("username", username, columnLengths), errorLabel))
+            if (!validateAndSetError(validateExceedCharLength("username", username, columnLengths), errorLabel))
                 return;
             if (!validateAndSetError(validateUsernameTaken(username, dbHandler, TABLE_NAME), errorLabel))
                 return;
-            if (!validateAndSetError(validateUsernameCharacters(username), errorLabel))
-                return;
-            if (!validateAndSetError(validateHasCharacters("display_name", displayName), errorLabel))
-                return;
-            if (!validateAndSetError(validateCharLength("display_name", displayName, columnLengths), errorLabel))
+            if (!validateAndSetError(validateOnlyAlphanumericCharacters("username", username), errorLabel))
                 return;
             if (!validateAndSetError(validateHasCharacters("password", password), errorLabel))
                 return;
-            if (!validateAndSetError(validateCharLength("password", password, columnLengths), errorLabel))
+            if (!validateAndSetError(validateExceedCharLength("password", password, columnLengths), errorLabel))
                 return;
-            if (!validateAndSetError(validateHasCharacters("address", address), errorLabel))
+            if (!validateAndSetError(validateHasCharacters("email", email), errorLabel))
                 return;
-            if (!validateAndSetError(validateCharLength("address", address, columnLengths), errorLabel))
+            if (!validateAndSetError(validateEmail(email), errorLabel))
+                return;
+            if (!validateAndSetError(validateExceedCharLength("email", email, columnLengths), errorLabel))
                 return;
             if (!validateAndSetError(validateHasCharacters("contact_number", contactNumber), errorLabel))
                 return;
-            if (!validateAndSetError(validateCharLength("contact_number", contactNumber, columnLengths), errorLabel))
+            if (!validateAndSetError(validateOnlyDigitCharacters("contact_number", contactNumber), errorLabel))
                 return;
-            if (!validateAndSetError(validateContactCharacters(contactNumber), errorLabel))
+            if (!validateAndSetError(validateExactCharLength("contact_number", contactNumber, columnLengths),
+                    errorLabel))
+                return;
+            if (!validateAndSetError(validateHasSelectedOption("region", region), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasSelectedOption("city_or_municipality", cityOrMunicipality), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasCharacters("barangay", barangay), errorLabel))
+                return;
+            if (!validateAndSetError(validateExceedCharLength("barangay", barangay, columnLengths), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasCharacters("zip_code", zipCode), errorLabel))
+                return;
+            if (!validateAndSetError(validateOnlyDigitCharacters("zip_code", zipCode), errorLabel))
+                return;
+            if (!validateAndSetError(validateExactCharLength("zip_code", zipCode, columnLengths),
+                    errorLabel))
                 return;
 
-            if (buyerDbHandler.registerBuyer(username, displayName, password, address, contactNumber)) {
+            if (buyerDbHandler.registerBuyer(username, organizationName, password, email, contactNumber, region,
+                    cityOrMunicipality, barangay, zipCode)) {
                 System.out.println("Buyer registration successful.");
-                // Add function for proceeding to login page
+                callback.onSuccess();
             } else {
                 displayErrorMessage("Buyer registration failed.", errorLabel);
             }
         }
 
         @Override
-        public void login(String username, String password, JLabel errorLabel) {
-            handleLogin(dbHandler, "Buyer", username, password, errorLabel);
+        public void login(String username, String password, JLabel errorLabel, LoginCallback callback) {
+            handleLogin(dbHandler, "Buyer", username, password, errorLabel, callback);
         }
     }
 }

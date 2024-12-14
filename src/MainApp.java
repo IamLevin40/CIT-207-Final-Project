@@ -1,11 +1,12 @@
 package src;
 
 import javax.swing.*;
+import java.awt.*;
 
+import data.RegionCityData;
 import src.UserService.BuyerService;
 import src.UserService.SellerService;
-
-import java.awt.*;
+import utils.JNumberTextField;
 
 public class MainApp {
     private static JFrame activeFrame;
@@ -18,6 +19,8 @@ public class MainApp {
         if (activeFrame != null) {
             activeFrame.dispose();
         }
+        newFrame.setResizable(false);
+        newFrame.setLocationRelativeTo(null);
         activeFrame = newFrame;
         activeFrame.setVisible(true);
     }
@@ -39,8 +42,8 @@ class MainMenu extends JFrame {
         UserService.SellerService sellerService = new UserService.SellerService(sellerDbHandler);
         UserService.BuyerService buyerService = new UserService.BuyerService(buyerDbHandler);
 
-        sellerButton.addActionListener(e -> MainApp.showFrame(new SellerLoginFrame("Seller", sellerService)));
-        buyerButton.addActionListener(e -> MainApp.showFrame(new BuyerLoginFrame("Buyer", buyerService)));
+        sellerButton.addActionListener(e -> MainApp.showFrame(new SellerLoginFrame(sellerService)));
+        buyerButton.addActionListener(e -> MainApp.showFrame(new BuyerLoginFrame(buyerService)));
         exitButton.addActionListener(e -> System.exit(0));
 
         add(sellerButton);
@@ -50,11 +53,11 @@ class MainMenu extends JFrame {
 }
 
 class SellerLoginFrame extends JFrame {
-    public SellerLoginFrame(String userType, SellerService sellerService) {
-        setTitle(userType + " Login");
+    public SellerLoginFrame(SellerService sellerService) {
+        setTitle("Seller Login");
         setSize(400, 200);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new GridLayout(4, 2));
+        setLayout(new GridLayout(6, 2));
 
         JLabel usernameLabel = new JLabel("Username:");
         JTextField usernameField = new JTextField();
@@ -63,6 +66,7 @@ class SellerLoginFrame extends JFrame {
 
         JButton loginButton = new JButton("Login");
         JButton registerButton = new JButton("Register");
+        JButton backButton = new JButton("Back");
 
         JLabel errorLabel = new JLabel("");
         errorLabel.setForeground(Color.RED);
@@ -70,28 +74,38 @@ class SellerLoginFrame extends JFrame {
         loginButton.addActionListener(e -> {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
-            sellerService.login(username, password, errorLabel);
+            sellerService.login(username, password, errorLabel, new UserService.LoginCallback() {
+                @Override
+                public void onSuccess() {
+                    MainApp.showFrame(new SellerHomePage());
+                }
+            });
         });
 
-        registerButton.addActionListener(e -> MainApp.showFrame(new SellerRegisterFrame(userType, sellerService)));
+        registerButton.addActionListener(e -> MainApp.showFrame(new SellerRegisterFrame(sellerService)));
+        backButton.addActionListener(e -> MainApp.showFrame(new MainMenu()));
 
+        add(backButton);
+        add(new JLabel());
+        add(new JLabel());
+        add(new JLabel());
         add(usernameLabel);
         add(usernameField);
         add(passwordLabel);
         add(passwordField);
-        add(loginButton);
         add(registerButton);
+        add(loginButton);
         add(new JLabel());
         add(errorLabel);
     }
 }
 
 class BuyerLoginFrame extends JFrame {
-    public BuyerLoginFrame(String userType, BuyerService buyerService) {
-        setTitle(userType + " Login");
+    public BuyerLoginFrame(BuyerService buyerService) {
+        setTitle("Buyer Login");
         setSize(400, 200);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new GridLayout(4, 2));
+        setLayout(new GridLayout(6, 2));
 
         JLabel usernameLabel = new JLabel("Username:");
         JTextField usernameField = new JTextField();
@@ -100,6 +114,7 @@ class BuyerLoginFrame extends JFrame {
 
         JButton loginButton = new JButton("Login");
         JButton registerButton = new JButton("Register");
+        JButton backButton = new JButton("Back");
 
         JLabel errorLabel = new JLabel("");
         errorLabel.setForeground(Color.RED);
@@ -107,65 +122,127 @@ class BuyerLoginFrame extends JFrame {
         loginButton.addActionListener(e -> {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
-            buyerService.login(username, password, errorLabel);
+            buyerService.login(username, password, errorLabel, new UserService.LoginCallback() {
+                @Override
+                public void onSuccess() {
+                    MainApp.showFrame(new BuyerHomePage());
+                }
+            });
         });
 
-        registerButton.addActionListener(e -> MainApp.showFrame(new BuyerRegisterFrame(userType, buyerService)));
+        registerButton.addActionListener(e -> MainApp.showFrame(new BuyerRegisterFrame(buyerService)));
+        backButton.addActionListener(e -> MainApp.showFrame(new MainMenu()));
 
+        add(backButton);
+        add(new JLabel());
+        add(new JLabel());
+        add(new JLabel());
         add(usernameLabel);
         add(usernameField);
         add(passwordLabel);
         add(passwordField);
-        add(loginButton);
         add(registerButton);
+        add(loginButton);
         add(new JLabel());
         add(errorLabel);
     }
 }
 
 class SellerRegisterFrame extends JFrame {
-    public SellerRegisterFrame(String userType, SellerService sellerService) {
-        setTitle(userType + " Registration");
+    public SellerRegisterFrame(SellerService sellerService) {
+        setTitle("Seller Registration");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new GridLayout(7, 2));
+        setLayout(new GridLayout(12, 2));
 
+        JLabel lastNameLabel = new JLabel("Last Name:");
+        JTextField lastNameField = new JTextField();
+        JLabel firstNameLabel = new JLabel("First Name:");
+        JTextField firstNameField = new JTextField();
         JLabel usernameLabel = new JLabel("Username:");
         JTextField usernameField = new JTextField();
-        JLabel displayNameLabel = new JLabel("Display Name:");
-        JTextField displayNameField = new JTextField();
         JLabel passwordLabel = new JLabel("Password:");
         JPasswordField passwordField = new JPasswordField();
-        JLabel addressLabel = new JLabel("Address:");
-        JTextField addressField = new JTextField();
-        JLabel contactLabel = new JLabel("Contact Number:");
-        JTextField contactField = new JTextField();
+        JLabel emailLabel = new JLabel("Email:");
+        JTextField emailField = new JTextField();
+        JLabel contactNumberLabel = new JLabel("Contact Number: +63");
+        JNumberTextField contactNumberField = new JNumberTextField(10);
+        JLabel regionLabel = new JLabel("Region:");
+        JComboBox<String> regionComboBox = new JComboBox<>();
+        regionComboBox.addItem("Select Region");
+        RegionCityData.getRegions().forEach(regionComboBox::addItem);
+        JLabel cityOrMunicipalityLabel = new JLabel("City/Municipality:");
+        JComboBox<String> cityOrMunicipalityComboBox = new JComboBox<>();
+        JLabel barangayLabel = new JLabel("Barangay");
+        JTextField barangayField = new JTextField();
+        JLabel zipCodeLabel = new JLabel("Zip Code:");
+        JNumberTextField zipCodeField = new JNumberTextField(4);
+
+        cityOrMunicipalityComboBox.setEnabled(false);
+        regionComboBox.addActionListener(e -> {
+            String selectedRegion = (String) regionComboBox.getSelectedItem();
+            if ("Select Region".equals(selectedRegion)) {
+                cityOrMunicipalityComboBox.setEnabled(false);
+                cityOrMunicipalityComboBox.removeAllItems();
+            } else {
+                cityOrMunicipalityComboBox.setEnabled(true);
+                cityOrMunicipalityComboBox.removeAllItems();
+                for (String city : RegionCityData.getCities(selectedRegion)) {
+                    cityOrMunicipalityComboBox.addItem(city);
+                }
+            }
+        });
 
         JButton registerButton = new JButton("Register");
+        JButton backButton = new JButton("Back");
 
         JLabel errorLabel = new JLabel("");
         errorLabel.setForeground(Color.RED);
 
         registerButton.addActionListener(e -> {
+            String lastName = lastNameField.getText();
+            String firstName = firstNameField.getText();
             String username = usernameField.getText();
-            String displayName = displayNameField.getText();
             String password = new String(passwordField.getPassword());
-            String address = addressField.getText();
-            String contact = contactField.getText();
-            sellerService.register(username, displayName, password, address, contact, errorLabel);
+            String email = emailField.getText();
+            String contactNumber = contactNumberField.getText();
+            String region = (String) regionComboBox.getSelectedItem();
+            String cityOrMunicipality = (String) cityOrMunicipalityComboBox.getSelectedItem();
+            String barangay = barangayField.getText();
+            String zipCode = zipCodeField.getText();
+            sellerService.register(lastName, firstName, username, password, email, contactNumber, region,
+                    cityOrMunicipality, barangay, zipCode, errorLabel,
+                    new UserService.RegisterCallback() {
+                        @Override
+                        public void onSuccess() {
+                            MainApp.showFrame(new SellerLoginFrame(sellerService));
+                        }
+                    });
         });
 
+        backButton.addActionListener(e -> MainApp.showFrame(new SellerLoginFrame(sellerService)));
+
+        add(lastNameLabel);
+        add(lastNameField);
+        add(firstNameLabel);
+        add(firstNameField);
         add(usernameLabel);
         add(usernameField);
-        add(displayNameLabel);
-        add(displayNameField);
         add(passwordLabel);
         add(passwordField);
-        add(addressLabel);
-        add(addressField);
-        add(contactLabel);
-        add(contactField);
-        add(new JLabel());
+        add(emailLabel);
+        add(emailField);
+        add(contactNumberLabel);
+        add(contactNumberField);
+        add(regionLabel);
+        add(regionComboBox);
+        add(cityOrMunicipalityLabel);
+        add(cityOrMunicipalityComboBox);
+        add(barangayLabel);
+        add(barangayField);
+        add(zipCodeLabel);
+        add(zipCodeField);
+        add(backButton);
         add(registerButton);
         add(new JLabel());
         add(errorLabel);
@@ -173,50 +250,131 @@ class SellerRegisterFrame extends JFrame {
 }
 
 class BuyerRegisterFrame extends JFrame {
-    public BuyerRegisterFrame(String userType, BuyerService buyerService) {
-        setTitle(userType + " Registration");
+    public BuyerRegisterFrame(BuyerService buyerService) {
+        setTitle("Buyer Registration");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new GridLayout(7, 2));
+        setLayout(new GridLayout(11, 2));
 
+        JLabel organizationNameLabel = new JLabel("Organization Name:");
+        JTextField organizationNameField = new JTextField();
         JLabel usernameLabel = new JLabel("Username:");
         JTextField usernameField = new JTextField();
-        JLabel displayNameLabel = new JLabel("Display Name:");
-        JTextField displayNameField = new JTextField();
         JLabel passwordLabel = new JLabel("Password:");
         JPasswordField passwordField = new JPasswordField();
-        JLabel addressLabel = new JLabel("Address:");
-        JTextField addressField = new JTextField();
-        JLabel contactLabel = new JLabel("Contact Number:");
-        JTextField contactField = new JTextField();
+        JLabel emailLabel = new JLabel("Email:");
+        JTextField emailField = new JTextField();
+        JLabel contactNumberLabel = new JLabel("Contact Number: +63");
+        JNumberTextField contactNumberField = new JNumberTextField(10);
+        JLabel regionLabel = new JLabel("Region:");
+        JComboBox<String> regionComboBox = new JComboBox<>();
+        regionComboBox.addItem("Select Region");
+        RegionCityData.getRegions().forEach(regionComboBox::addItem);
+        JLabel cityOrMunicipalityLabel = new JLabel("City/Municipality:");
+        JComboBox<String> cityOrMunicipalityComboBox = new JComboBox<>();
+        JLabel barangayLabel = new JLabel("Barangay");
+        JTextField barangayField = new JTextField();
+        JLabel zipCodeLabel = new JLabel("Zip Code:");
+        JNumberTextField zipCodeField = new JNumberTextField(4);
+
+        cityOrMunicipalityComboBox.setEnabled(false);
+        regionComboBox.addActionListener(e -> {
+            String selectedRegion = (String) regionComboBox.getSelectedItem();
+            if ("Select Region".equals(selectedRegion)) {
+                cityOrMunicipalityComboBox.setEnabled(false);
+                cityOrMunicipalityComboBox.removeAllItems();
+            } else {
+                cityOrMunicipalityComboBox.setEnabled(true);
+                cityOrMunicipalityComboBox.removeAllItems();
+                for (String city : RegionCityData.getCities(selectedRegion)) {
+                    cityOrMunicipalityComboBox.addItem(city);
+                }
+            }
+        });
 
         JButton registerButton = new JButton("Register");
+        JButton backButton = new JButton("Back");
 
         JLabel errorLabel = new JLabel("");
         errorLabel.setForeground(Color.RED);
 
         registerButton.addActionListener(e -> {
+            String organizationName = organizationNameField.getText();
             String username = usernameField.getText();
-            String displayName = displayNameField.getText();
             String password = new String(passwordField.getPassword());
-            String address = addressField.getText();
-            String contact = contactField.getText();
-            buyerService.register(username, displayName, password, address, contact, errorLabel);
+            String email = emailField.getText();
+            String contactNumber = contactNumberField.getText();
+            String region = (String) regionComboBox.getSelectedItem();
+            String cityOrMunicipality = (String) cityOrMunicipalityComboBox.getSelectedItem();
+            String barangay = barangayField.getText();
+            String zipCode = zipCodeField.getText();
+            buyerService.register(organizationName, username, password, email, contactNumber, region,
+                    cityOrMunicipality, barangay, zipCode, errorLabel,
+                    new UserService.RegisterCallback() {
+                        @Override
+                        public void onSuccess() {
+                            MainApp.showFrame(new BuyerLoginFrame(buyerService));
+                        }
+                    });
         });
 
+        backButton.addActionListener(e -> MainApp.showFrame(new BuyerLoginFrame(buyerService)));
+
+        add(organizationNameLabel);
+        add(organizationNameField);
         add(usernameLabel);
         add(usernameField);
-        add(displayNameLabel);
-        add(displayNameField);
         add(passwordLabel);
         add(passwordField);
-        add(addressLabel);
-        add(addressField);
-        add(contactLabel);
-        add(contactField);
-        add(new JLabel());
+        add(emailLabel);
+        add(emailField);
+        add(contactNumberLabel);
+        add(contactNumberField);
+        add(regionLabel);
+        add(regionComboBox);
+        add(cityOrMunicipalityLabel);
+        add(cityOrMunicipalityComboBox);
+        add(barangayLabel);
+        add(barangayField);
+        add(zipCodeLabel);
+        add(zipCodeField);
+        add(backButton);
         add(registerButton);
         add(new JLabel());
         add(errorLabel);
+    }
+}
+
+class SellerHomePage extends JFrame {
+    public SellerHomePage() {
+        setTitle("Seller Home Page");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new FlowLayout());
+
+        JLabel welcomeLabel = new JLabel("Welcome to the Seller Home Page!");
+        JButton logoutButton = new JButton("Logout");
+
+        logoutButton.addActionListener(e -> MainApp.showFrame(new MainMenu()));
+
+        add(welcomeLabel);
+        add(logoutButton);
+    }
+}
+
+class BuyerHomePage extends JFrame {
+    public BuyerHomePage() {
+        setTitle("Buyer Home Page");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new FlowLayout());
+
+        JLabel welcomeLabel = new JLabel("Welcome to the Buyer Home Page!");
+        JButton logoutButton = new JButton("Logout");
+
+        logoutButton.addActionListener(e -> MainApp.showFrame(new MainMenu()));
+
+        add(welcomeLabel);
+        add(logoutButton);
     }
 }

@@ -16,16 +16,27 @@ public interface DatabaseHandler {
 
     default Map<String, Integer> getColumnMaxLengths(String tableName) {
         Map<String, Integer> columnLengths = new HashMap<>();
-        String query = "SELECT COLUMN_NAME, CHARACTER_MAXIMUM_LENGTH " +
+        String query = "SELECT COLUMN_NAME, CHARACTER_MAXIMUM_LENGTH, COLUMN_TYPE " +
                 "FROM INFORMATION_SCHEMA.COLUMNS " +
                 "WHERE TABLE_NAME = ? AND TABLE_SCHEMA = ?";
 
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, tableName);
             stmt.setString(2, DATABASE);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    columnLengths.put(rs.getString("COLUMN_NAME"), rs.getInt("CHARACTER_MAXIMUM_LENGTH"));
+                    String columnName = rs.getString("COLUMN_NAME");
+                    Integer maxLength = rs.getObject("CHARACTER_MAXIMUM_LENGTH") != null
+                            ? rs.getInt("CHARACTER_MAXIMUM_LENGTH")
+                            : null;
+                    String columnType = rs.getString("COLUMN_TYPE");
+
+                    if (maxLength == null || maxLength == 0) {
+                        maxLength = extractNumericPrecision(columnType);
+                    }
+
+                    columnLengths.put(columnName, maxLength != null ? maxLength : 0);
                 }
             }
         } catch (SQLException e) {
@@ -33,6 +44,19 @@ public interface DatabaseHandler {
         }
 
         return columnLengths;
+    }
+
+    private Integer extractNumericPrecision(String columnType) {
+        if (columnType == null)
+            return null;
+
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\((\\d+)\\)");
+        java.util.regex.Matcher matcher = pattern.matcher(columnType);
+
+        if (matcher.find()) {
+            return Integer.parseInt(matcher.group(1));
+        }
+        return null;
     }
 
     default boolean isUsernameTaken(String username, String tableName) {
@@ -68,15 +92,20 @@ public interface DatabaseHandler {
 }
 
 class SellerDatabaseHandler implements DatabaseHandler {
-    public boolean registerSeller(String username, String displayName, String password, String address,
-            String contactNumber) {
-        String query = "INSERT INTO Seller (username, display_name, password, address, contact_number) VALUES (?, ?, ?, ?, ?)";
+    public boolean registerSeller(String username, String lastName, String firstName, String password, String email,
+            String contactNumber, String region, String cityOrMunicipality, String barangay, String zipCode) {
+        String query = "INSERT INTO Seller (username, last_name, first_name, password, email, contact_number, region, city_or_municipality, barangay, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, username);
-            stmt.setString(2, displayName);
-            stmt.setString(3, password);
-            stmt.setString(4, address);
-            stmt.setString(5, contactNumber);
+            stmt.setString(2, lastName);
+            stmt.setString(3, firstName);
+            stmt.setString(4, password);
+            stmt.setString(5, email);
+            stmt.setString(6, contactNumber);
+            stmt.setString(7, region);
+            stmt.setString(8, cityOrMunicipality);
+            stmt.setString(9, barangay);
+            stmt.setString(10, zipCode);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -87,15 +116,19 @@ class SellerDatabaseHandler implements DatabaseHandler {
 }
 
 class BuyerDatabaseHandler implements DatabaseHandler {
-    public boolean registerBuyer(String username, String displayName, String password, String address,
-            String contactNumber) {
-        String query = "INSERT INTO Buyer (username, display_name, password, address, contact_number) VALUES (?, ?, ?, ?, ?)";
+    public boolean registerBuyer(String username, String oeganizationName, String password, String email,
+            String contactNumber, String region, String cityOrMunicipality, String barangay, String zipCode) {
+        String query = "INSERT INTO Buyer (username, organization_name, password, email, contact_number, region, city_or_municipality, barangay, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, username);
-            stmt.setString(2, displayName);
+            stmt.setString(2, oeganizationName);
             stmt.setString(3, password);
-            stmt.setString(4, address);
+            stmt.setString(4, email);
             stmt.setString(5, contactNumber);
+            stmt.setString(6, region);
+            stmt.setString(7, cityOrMunicipality);
+            stmt.setString(8, barangay);
+            stmt.setString(9, zipCode);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {

@@ -1,4 +1,4 @@
-package src;
+package utils;
 
 public class Utils {
     public static String capitalize(String str) {
