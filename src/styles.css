@@ -1,0 +1,46 @@
+.root {
+    -fx-font-family: "Arial";
+}
+
+.main-menu {
+    -fx-padding: 20;
+    -fx-background-color: #f4f4f4;
+    -fx-spacing: 15;
+}
+
+.login-frame {
+    -fx-padding: 20;
+    -fx-background-color: #e8f0fe;
+    -fx-spacing: 10;
+}
+
+.register-frame {
+    -fx-padding: 5;
+    -fx-background-color: #e8f0fe;
+    -fx-spacing: 5;
+}
+
+.home-page-frame {
+    -fx-padding: 5;
+    -fx-background-color: #e8f0fe;
+    -fx-spacing: 5;
+}
+
+.button {
+    -fx-font-size: 12px;
+    -fx-padding: 10 20;
+}
+
+.label {
+    -fx-font-weight: bold;
+}
+
+.text-field {
+    -fx-font-size: 12px;
+    -fx-padding: 5 10;
+}
+
+.error-label {
+    -fx-text-fill: red;
+    -fx-font-size: 12px;
+}

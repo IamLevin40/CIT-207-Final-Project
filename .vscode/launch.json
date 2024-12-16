@@ -1,0 +1,55 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "AccountForm",
+            "request": "launch",
+            "mainClass": "main.AccountForm",
+            "projectName": "CIT-207-Final-Project_2fc91172"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "main.Main",
+            "projectName": "CIT-207-Final-Project_2fc91172"
+        },
+        {
+            "type": "java",
+            "name": "HelloFx",
+            "request": "launch",
+            "mainClass": "test.HelloFx",
+            "projectName": "CIT-207-Final-Project_2fc91172"
+        },
+        {
+            "type": "java",
+            "name": "HelloFx",
+            "request": "launch",
+            "mainClass": "src.HelloFx",
+            "projectName": "CIT-207-Final-Project_2fc91172"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "src.Main",
+            "projectName": "CIT-207-Final-Project_2fc91172"
+        },
+        {
+            "type": "java",
+            "name": "AccountForm",
+            "request": "launch",
+            "mainClass": "src.AccountForm",
+            "projectName": "CIT-207-Final-Project_2fc91172"
+        },
+        {
+            "type": "java",
+            "name": "Launch JavaFX App",
+            "request": "launch",
+            "mainClass": "Main",
+            "vmArgs": "--module-path .lib/javafx-sdk/lib --add-modules javafx.controls,javafx.fxml -Dprism.order=sw"
+        }
+    ]
+  }
+  
