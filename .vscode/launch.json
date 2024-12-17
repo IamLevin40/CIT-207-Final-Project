@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "AppFrames",
+            "request": "launch",
+            "mainClass": "main.AppFrames",
+            "projectName": "CIT-207-Final-Project_2fc91172"
+        },
+        {
+            "type": "java",
             "name": "AccountForm",
             "request": "launch",
             "mainClass": "main.AccountForm",

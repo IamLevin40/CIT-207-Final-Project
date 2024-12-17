@@ -128,10 +128,11 @@ public interface DatabaseHandler {
     default List<Map<String, Object>> executeReadQuery(String query, Object[] params) {
         List<Map<String, Object>> result = new ArrayList<>();
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(query)) {
-            for (int i = 0; i < params.length; i++) {
-                stmt.setObject(i + 1, params[i]);
+            if (params.length > 0) {
+                for (int i = 0; i < params.length; i++) {
+                    stmt.setObject(i + 1, params[i]);
+                }
             }
-
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     result.add(mapRowToMap(rs));
@@ -145,8 +146,10 @@ public interface DatabaseHandler {
 
     default boolean executeUpdateQuery(String query, Object[] params) {
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(query)) {
-            for (int i = 0; i < params.length; i++) {
-                stmt.setObject(i + 1, params[i]);
+            if (params.length > 0) {
+                for (int i = 0; i < params.length; i++) {
+                    stmt.setObject(i + 1, params[i]);
+                }
             }
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -192,9 +195,9 @@ class SellerDatabaseHandler implements DatabaseHandler {
         return false;
     }
 
-    public Map<String, Object> getSellerNameById(String id) {
-        String query = "SELECT last_name, first_name FROM " + Global.SELLER_TABLE_NAME + " WHERE id = ?";
-        List<Map<String, Object>> results = executeReadQuery(query, new Object[] { id });
+    public Map<String, Object> getFullNameByUsername(String username) {
+        String query = "SELECT last_name, first_name FROM " + Global.SELLER_TABLE_NAME + " WHERE username = ?";
+        List<Map<String, Object>> results = executeReadQuery(query, new Object[] { username });
         if (!results.isEmpty()) {
             return results.get(0);
         }
@@ -296,8 +299,13 @@ class ProductDatabaseHandler implements DatabaseHandler {
         return null;
     }
 
+    public List<Map<String, Object>> getAllCrops() {
+        return executeReadQuery("SELECT id, name FROM " + Global.CROP_TABLE_NAME, new Object[] {});
+    }
+
     public Map<String, Object> getCropNameById(String id) {
-        String query = "SELECT name FROM " + Global.CROP_TABLE_NAME + " WHERE id = ?";
+        String query = "SELECT name FROM " + Global.CROP_TABLE_NAME + " WHERE id = ? ORDER BY " + Global.CROP_TABLE_NAME
+                + ".id ASC";
         List<Map<String, Object>> results = executeReadQuery(query, new Object[] { id });
         if (!results.isEmpty()) {
             return results.get(0);
@@ -306,36 +314,56 @@ class ProductDatabaseHandler implements DatabaseHandler {
     }
 
     public List<Map<String, Object>> getFoodbankBySearch(int limit, int page, String search) {
-        int offset = limit * (page - 1);
+        boolean noLimit = (limit == -1 && page == -1);
         String query = "SELECT f.* FROM " + Global.FOODBANK_TABLE_NAME + " f " +
                 "JOIN " + Global.CROP_TABLE_NAME + " c ON f.crop_id = c.id " +
                 "WHERE c.name LIKE ? OR c.category LIKE ? " +
-                "ORDER BY f.id ASC " +
-                "LIMIT ? OFFSET ?";
-        return executeReadQuery(query, new Object[] { "%" + search + "%", "%" + search + "%", limit, offset });
+                "ORDER BY f.id ASC" + (noLimit ? "" : " LIMIT ? OFFSET ?");
+
+        if (noLimit) {
+            return executeReadQuery(query, new Object[] { "%" + search + "%", "%" + search + "%" });
+        } else {
+            int offset = limit * (page - 1);
+            return executeReadQuery(query, new Object[] { "%" + search + "%", "%" + search + "%", limit, offset });
+        }
     }
 
     public List<Map<String, Object>> getPopularFoodbank(int limit, int page) {
-        int offset = limit * (page - 1);
+        boolean noLimit = (limit == -1 && page == -1);
         String query = "SELECT * FROM " + Global.FOODBANK_TABLE_NAME + " WHERE is_popular = true " +
-                "ORDER BY quantity DESC " +
-                "LIMIT ? OFFSET ?";
-        return executeReadQuery(query, new Object[] { limit, offset });
+                "ORDER BY quantity DESC" + (noLimit ? "" : " LIMIT ? OFFSET ?");
+
+        if (noLimit) {
+            return executeReadQuery(query, new Object[] {});
+        } else {
+            int offset = limit * (page - 1);
+            return executeReadQuery(query, new Object[] { limit, offset });
+        }
     }
 
     public List<Map<String, Object>> getDiscountedFoodbank(int limit, int page) {
-        int offset = limit * (page - 1);
+        boolean noLimit = (limit == -1 && page == -1);
         String query = "SELECT * FROM " + Global.FOODBANK_TABLE_NAME + " WHERE discount > 0 " +
-                "ORDER BY discount DESC " +
-                "LIMIT ? OFFSET ?";
-        return executeReadQuery(query, new Object[] { limit, offset });
+                "ORDER BY discount DESC" + (noLimit ? "" : " LIMIT ? OFFSET ?");
+
+        if (noLimit) {
+            return executeReadQuery(query, new Object[] {});
+        } else {
+            int offset = limit * (page - 1);
+            return executeReadQuery(query, new Object[] { limit, offset });
+        }
     }
 
     public List<Map<String, Object>> getFoodbankBySeller(int limit, int page, String sellerId) {
-        int offset = limit * (page - 1);
+        boolean noLimit = (limit == -1 && page == -1);
         String query = "SELECT * FROM " + Global.FOODBANK_TABLE_NAME + " WHERE seller_id = ? " +
-                "ORDER BY id ASC " +
-                "LIMIT ? OFFSET ?";
-        return executeReadQuery(query, new Object[] { sellerId, limit, offset });
+                "ORDER BY id ASC" + (noLimit ? "" : " LIMIT ? OFFSET ?");
+
+        if (noLimit) {
+            return executeReadQuery(query, new Object[] { sellerId });
+        } else {
+            int offset = limit * (page - 1);
+            return executeReadQuery(query, new Object[] { sellerId, limit, offset });
+        }
     }
 }
