@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.regex.*;
 
 import javafx.scene.control.*;
+import utils.Global;
 import utils.Manipulate;
 
 public interface UserService {
@@ -111,19 +112,16 @@ public interface UserService {
     }
 
     public static class SellerService implements UserService {
-        private final SellerDatabaseHandler sellerDbHandler;
-        private final DatabaseHandler dbHandler;
-        private final String TABLE_NAME = "Seller";
+        private final SellerDatabaseHandler dbHandler;
 
-        public SellerService(DatabaseHandler dbHandler) {
-            this.dbHandler = dbHandler;
-            this.sellerDbHandler = new SellerDatabaseHandler();
+        public SellerService() {
+            this.dbHandler = new SellerDatabaseHandler();
         }
 
         public void register(String lastName, String firstName, String username, String password, String email,
                 String contactNumber, String region, String cityOrMunicipality, String barangay, String zipCode,
                 Label errorLabel, RegisterCallback callback) {
-            Map<String, Integer> columnLengths = dbHandler.getColumnMaxLengths(TABLE_NAME);
+            Map<String, Integer> columnLengths = dbHandler.getColumnMaxLengths(Global.SELLER_TABLE_NAME);
 
             if (!validateAndSetError(validateHasCharacters("last_name", lastName), errorLabel))
                 return;
@@ -137,7 +135,7 @@ public interface UserService {
                 return;
             if (!validateAndSetError(validateExceedCharLength("username", username, columnLengths), errorLabel))
                 return;
-            if (!validateAndSetError(validateUsernameTaken(username, dbHandler, TABLE_NAME), errorLabel))
+            if (!validateAndSetError(validateUsernameTaken(username, dbHandler, Global.SELLER_TABLE_NAME), errorLabel))
                 return;
             if (!validateAndSetError(validateOnlyAlphanumericCharacters("username", username), errorLabel))
                 return;
@@ -174,7 +172,7 @@ public interface UserService {
                     errorLabel))
                 return;
 
-            if (sellerDbHandler.registerSeller(username, lastName, firstName, password, email, contactNumber, region,
+            if (dbHandler.registerSeller(username, lastName, firstName, password, email, contactNumber, region,
                     cityOrMunicipality, barangay, zipCode)) {
                 System.out.println("Seller registration successful.");
                 callback.onSuccess();
@@ -185,24 +183,21 @@ public interface UserService {
 
         @Override
         public void login(String username, String password, Label errorLabel, LoginCallback callback) {
-            handleLogin(dbHandler, "Seller", username, password, errorLabel, callback);
+            handleLogin(dbHandler, Global.SELLER_TABLE_NAME, username, password, errorLabel, callback);
         }
     }
 
     public static class BuyerService implements UserService {
-        private final BuyerDatabaseHandler buyerDbHandler;
-        private final DatabaseHandler dbHandler;
-        private final String TABLE_NAME = "Buyer";
+        private final BuyerDatabaseHandler dbHandler;
 
-        public BuyerService(DatabaseHandler dbHandler) {
-            this.dbHandler = dbHandler;
-            this.buyerDbHandler = new BuyerDatabaseHandler();
+        public BuyerService() {
+            this.dbHandler = new BuyerDatabaseHandler();
         }
 
         public void register(String organizationName, String username, String password, String email,
                 String contactNumber, String region, String cityOrMunicipality, String barangay, String zipCode,
                 Label errorLabel, RegisterCallback callback) {
-            Map<String, Integer> columnLengths = dbHandler.getColumnMaxLengths(TABLE_NAME);
+            Map<String, Integer> columnLengths = dbHandler.getColumnMaxLengths(Global.BUYER_TABLE_NAME);
 
             if (!validateAndSetError(validateHasCharacters("organization_name", organizationName), errorLabel))
                 return;
@@ -213,7 +208,7 @@ public interface UserService {
                 return;
             if (!validateAndSetError(validateExceedCharLength("username", username, columnLengths), errorLabel))
                 return;
-            if (!validateAndSetError(validateUsernameTaken(username, dbHandler, TABLE_NAME), errorLabel))
+            if (!validateAndSetError(validateUsernameTaken(username, dbHandler, Global.BUYER_TABLE_NAME), errorLabel))
                 return;
             if (!validateAndSetError(validateOnlyAlphanumericCharacters("username", username), errorLabel))
                 return;
@@ -250,7 +245,7 @@ public interface UserService {
                     errorLabel))
                 return;
 
-            if (buyerDbHandler.registerBuyer(username, organizationName, password, email, contactNumber, region,
+            if (dbHandler.registerBuyer(username, organizationName, password, email, contactNumber, region,
                     cityOrMunicipality, barangay, zipCode)) {
                 System.out.println("Buyer registration successful.");
                 callback.onSuccess();
@@ -261,7 +256,7 @@ public interface UserService {
 
         @Override
         public void login(String username, String password, Label errorLabel, LoginCallback callback) {
-            handleLogin(dbHandler, "Buyer", username, password, errorLabel, callback);
+            handleLogin(dbHandler, Global.BUYER_TABLE_NAME, username, password, errorLabel, callback);
         }
     }
 }

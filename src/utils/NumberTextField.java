@@ -16,6 +16,7 @@ public class NumberTextField extends TextField {
     }
 
     private boolean isValidInput(String text) {
-        return text.matches("\\d*") && text.length() <= limit;
+        // Allow digits and at most one decimal point
+        return text.matches("\\d*\\.?\\d*") && text.length() <= limit;
     }
 }

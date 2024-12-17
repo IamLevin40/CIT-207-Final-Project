@@ -1,43 +1,15 @@
 package main;
 
-import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
 
 import main.UserService.BuyerService;
 import main.UserService.SellerService;
 import utils.NumberTextField;
 import data.RegionCityData;
 import utils.Global;
-
-//
-// Set up javafx scenes for account form page
-//
-public class AccountFormPage extends Application {
-    private static Stage stage;
-
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-    @SuppressWarnings("static-access")
-    @Override
-    public void start(Stage stage) {
-        this.stage = stage;
-        showScene(new MainMenu().getScene());
-    }
-
-    public static void showScene(Scene scene) {
-        scene.getStylesheets().add("styles.css"); // Link the CSS file here
-        stage.setScene(scene);
-        stage.centerOnScreen();
-        stage.show();
-        stage.setTitle("Foodai");
-    }
-}
 
 //
 // Display main menu
@@ -54,14 +26,12 @@ class MainMenu {
         Button exitButton = new Button("Exit"); // Exit button
 
         // Set up database
-        DatabaseHandler sellerDbHandler = new SellerDatabaseHandler();
-        DatabaseHandler buyerDbHandler = new BuyerDatabaseHandler();
-        UserService.SellerService sellerService = new UserService.SellerService(sellerDbHandler);
-        UserService.BuyerService buyerService = new UserService.BuyerService(buyerDbHandler);
+        UserService.SellerService sellerService = new UserService.SellerService();
+        UserService.BuyerService buyerService = new UserService.BuyerService();
 
         // Add event listener for buttons
-        sellerButton.setOnAction(e -> AccountFormPage.showScene(new SellerLoginFrame(sellerService).getScene()));
-        buyerButton.setOnAction(e -> AccountFormPage.showScene(new BuyerLoginFrame(buyerService).getScene()));
+        sellerButton.setOnAction(e -> AppFrames.showScene(new SellerLoginFrame(sellerService).getScene()));
+        buyerButton.setOnAction(e -> AppFrames.showScene(new BuyerLoginFrame(buyerService).getScene()));
         exitButton.setOnAction(e -> System.exit(0));
 
         // Add components to the layout
@@ -105,12 +75,12 @@ class SellerLoginFrame {
                     new UserService.LoginCallback() {
                         @Override
                         public void onSuccess() {
-                            AccountFormPage.showScene(new SellerHomePage().getScene());
+                            AppFrames.showScene(new SellerHomePage(username).getScene());
                         }
                     });
         });
-        registerButton.setOnAction(e -> AccountFormPage.showScene(new SellerRegisterFrame(sellerService).getScene()));
-        backButton.setOnAction(e -> AccountFormPage.showScene(new MainMenu().getScene()));
+        registerButton.setOnAction(e -> AppFrames.showScene(new SellerRegisterFrame(sellerService).getScene()));
+        backButton.setOnAction(e -> AppFrames.showScene(new MainMenu().getScene()));
 
         // Add components to the layout
         layout.getChildren().addAll(backButton, usernameLabel, usernameField, passwordLabel, passwordField,
@@ -153,12 +123,12 @@ class BuyerLoginFrame {
                     new UserService.LoginCallback() {
                         @Override
                         public void onSuccess() {
-                            AccountFormPage.showScene(new BuyerHomePage().getScene());
+                            AppFrames.showScene(new BuyerHomePage(username).getScene());
                         }
                     });
         });
-        registerButton.setOnAction(e -> AccountFormPage.showScene(new BuyerRegisterFrame(buyerService).getScene()));
-        backButton.setOnAction(e -> AccountFormPage.showScene(new MainMenu().getScene()));
+        registerButton.setOnAction(e -> AppFrames.showScene(new BuyerRegisterFrame(buyerService).getScene()));
+        backButton.setOnAction(e -> AppFrames.showScene(new MainMenu().getScene()));
 
         layout.getChildren().addAll(backButton, usernameLabel, usernameField, passwordLabel, passwordField,
                 registerButton, loginButton, errorLabel);
@@ -244,11 +214,11 @@ class SellerRegisterFrame {
                     barangay, zipCode, errorLabel, new UserService.RegisterCallback() {
                         @Override
                         public void onSuccess() {
-                            AccountFormPage.showScene(new SellerLoginFrame(sellerService).getScene());
+                            AppFrames.showScene(new SellerLoginFrame(sellerService).getScene());
                         }
                     });
         });
-        backButton.setOnAction(e -> AccountFormPage.showScene(new SellerLoginFrame(sellerService).getScene()));
+        backButton.setOnAction(e -> AppFrames.showScene(new SellerLoginFrame(sellerService).getScene()));
 
         // Add components to the layout
         layout.getChildren().addAll(lastNameLabel, lastNameField, firstNameLabel, firstNameField, usernameLabel,
@@ -284,8 +254,7 @@ class BuyerRegisterFrame {
         Label emailLabel = new Label("Email:");
         TextField emailField = new TextField();
         Label contactNumberLabel = new Label("Contact Number: +63");
-        TextField contactNumberField = new TextField();
-        contactNumberField.setPromptText("10 digits");
+        NumberTextField contactNumberField = new NumberTextField(10);
         Label regionLabel = new Label("Region:");
         ComboBox<String> regionComboBox = new ComboBox<>();
         regionComboBox.getItems().add("Select Region");
@@ -296,8 +265,7 @@ class BuyerRegisterFrame {
         Label barangayLabel = new Label("Barangay:");
         TextField barangayField = new TextField();
         Label zipCodeLabel = new Label("Zip Code:");
-        TextField zipCodeField = new TextField();
-        zipCodeField.setPromptText("4 digits");
+        NumberTextField zipCodeField = new NumberTextField(4);
 
         Label errorLabel = new Label();
         errorLabel.getStyleClass().add("error-label");
@@ -331,12 +299,12 @@ class BuyerRegisterFrame {
                     errorLabel, new UserService.RegisterCallback() {
                         @Override
                         public void onSuccess() {
-                            AccountFormPage.showScene(new BuyerLoginFrame(buyerService).getScene());
+                            AppFrames.showScene(new BuyerLoginFrame(buyerService).getScene());
                         }
                     });
         });
 
-        backButton.setOnAction(e -> AccountFormPage.showScene(new BuyerLoginFrame(buyerService).getScene()));
+        backButton.setOnAction(e -> AppFrames.showScene(new BuyerLoginFrame(buyerService).getScene()));
 
         layout.getChildren().addAll(orgNameLabel, orgNameField, usernameLabel, usernameField, passwordLabel,
                 passwordField, emailLabel, emailField, contactNumberLabel, contactNumberField, regionLabel,
