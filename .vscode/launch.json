@@ -3,6 +3,24 @@
     "configurations": [
         {
             "type": "java",
+            "name": "AccountFormPage",
+            "request": "launch",
+            "mainClass": "main.AccountFormPage",
+            "projectName": "CIT-207-Final-Project_191dd2ae"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "main.Main",
+            "projectName": "CIT-207-Final-Project_191dd2ae"
+            "name": "AppFrames",
+            "request": "launch",
+            "mainClass": "main.AppFrames",
+            "projectName": "CIT-207-Final-Project_2fc91172"
+        },
+        {
+            "type": "java",
             "name": "AccountForm",
             "request": "launch",
             "mainClass": "main.AccountForm",
