@@ -1,41 +1,38 @@
 .root {
-    -fx-font-family: "Arial";
+    -fx-font-family: "Inter", sans-serif;
+    -fx-background-color: #FFF;
 }
 
-.main-menu {
-    -fx-padding: 20;
-    -fx-background-color: #f4f4f4;
-    -fx-spacing: 15;
+
+.button {
+    -fx-background-color: none;
+    -fx-border-color: none;
+    -fx-font-size: 12px;
+    -fx-padding: 0 0;
 }
+
+/* .main-menu {
+    -fx-background-color: #e8f0fe;
+} */
 
 .login-frame {
     -fx-padding: 20;
-    -fx-background-color: #e8f0fe;
+    /* -fx-background-color: #e8f0fe; */
     -fx-spacing: 10;
 }
 
 .register-frame {
     -fx-padding: 5;
-    -fx-background-color: #e8f0fe;
+    /* -fx-background-color: #e8f0fe; */
     -fx-spacing: 5;
 }
 
 .home-page-frame {
     -fx-padding: 5;
-    -fx-background-color: #e8f0fe;
+    /* -fx-background-color: #e8f0fe; */
     -fx-spacing: 5;
 }
 
-.product-frame {
-    -fx-padding: 5;
-    -fx-background-color: #e8f0fe;
-    -fx-spacing: 5;
-}
-
-.button {
-    -fx-font-size: 12px;
-    -fx-padding: 10 20;
-}
 
 .label {
     -fx-font-weight: bold;
@@ -49,4 +46,141 @@
 .error-label {
     -fx-text-fill: red;
     -fx-font-size: 12px;
+}
+
+
+.exit-btn {
+    -fx-background-color: #ff0000;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-around;
+    /* Adjust as needed */
+    -fx-spacing: 25;
+    /* Adjust spacing between buttons */
+    /* -fx-border-color: green; */
+    /* -fx-border-width: 1px; */
+    /* -fx-border-style: solid; */
+
+
+    /* This is how u set a margin tho (no margin attribute like in CSS)*/
+    /* -fx-padding: 20px 0 0 0; */
+
+}
+
+
+.text-welcome,
+.text-foodai {
+    -fx-font-size: 26px;
+    -fx-font-weight: 700;
+    /* -fx-border-color: green;
+    -fx-border-width: 1px;
+    -fx-border-style: solid; */
+}
+
+.text-welcome {
+    -fx-padding: 20px 0 0 0;
+}
+
+
+.text-foodai {
+    -fx-text-fill: #40AA54;
+    -fx-padding: -10 0 15px 0;
+}
+
+.text-foodai_menu {
+    -fx-font-size: 26px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #40AA54;
+    -fx-padding: -10 0 50px 0;
+}
+
+.login-email {
+    -fx-font-size: 16px;
+    -fx-font-weight: 500;
+    -fx-background-color: #40AA54;
+    -fx-text-fill: white;
+    -fx-padding: 5px 25px 5px 25px;
+}
+
+
+
+.text-or {
+    -fx-font-size: 20px;
+    -fx-font-weight: 700;
+    -fx-padding: 15px 0;
+}
+
+.text-or_menu {
+    -fx-font-size: 16px;
+    -fx-font-weight: 700;
+    -fx-padding: 12px 0;
+}
+
+.google-btn,
+.apple-btn,
+.twitter-btn,
+.facebook-btn {
+    -fx-background-repeat: no-repeat;
+    -fx-padding: 10px 15px;
+    /* -fx-border-color: green; */
+    -fx-background-position: center;
+}
+
+.google-btn {
+    -fx-background-image: url('/images/google.png');
+
+}
+
+.apple-btn {
+    -fx-background-image: url('/images/apple.png');
+
+}
+
+.twitter-btn {
+    -fx-background-image: url('/images/twitter.png');
+
+}
+
+.facebook-btn {
+    -fx-background-image: url('/images/facebook.png');
+
+}
+
+/* ============================= */
+
+.menu-label {
+    -fx-text-fill: #AFACAC;
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+    -fx-line-height: normal;
+    -fx-padding: 0 0 10px 0;
+}
+
+.seller-btn,
+.buyer-btn {
+
+    -fx-border-color: #D9D9D9;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+    -fx-padding: 8px 100px;
+    -fx-font-size: 16px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #40AA54;
+    -fx-border-radius: 10px;
+}
+
+.form-container {
+    -fx-border-color: black;
+    /* Border color */
+    -fx-border-width: 2px;
+    /* Border width */
+    -fx-border-style: solid;
+    /* Border style */
+    -fx-padding: 10px;
+    /* Optional: Add padding inside the container */
+
 }
