@@ -270,10 +270,12 @@ class ProductDatabaseHandler implements DatabaseHandler {
 
     // ------------------------- UPDATE -------------------------
 
-    public boolean updateQuantityPriceImage(int id, double quantity, double price) {
+    public boolean updateQuantityPriceImage(int id, double quantity, double price, File image)
+            throws FileNotFoundException {
+        InputStream inputStream = new FileInputStream(image);
         String query = "UPDATE " + Global.FOODBANK_TABLE_NAME +
-                " SET quantity = ?, price = ? WHERE id = ?";
-        return executeUpdateQuery(query, new Object[] { quantity, price, id });
+                " SET quantity = ?, price = ?, image = ? WHERE id = ?";
+        return executeUpdateQuery(query, new Object[] { quantity, price, inputStream, id });
     }
 
     public boolean updateDiscountAndIsPopular(int id, int discount, boolean isPopular) {

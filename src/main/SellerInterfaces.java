@@ -1,6 +1,7 @@
 package main;
 
 import javafx.geometry.Pos;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -14,11 +15,10 @@ import main.ProductService.ProductRead;
 import main.ProductService.ProductUpdate;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import javax.security.auth.callback.Callback;
 
 import utils.Global;
 import utils.NumberTextField;
@@ -267,6 +267,7 @@ class SellerAddProductPage {
     private final ProductCreate productCreate;
     private final ProductRead productRead;
     private String username;
+    private File selectedImageFile = null;
 
     public SellerAddProductPage(String username) {
         this.productCreate = new ProductCreate();
@@ -282,7 +283,8 @@ class SellerAddProductPage {
         Button backButton = new Button("Back");
         Label titleLabel = new Label("Add Product");
         Label imageLabel = new Label("Upload Image:");
-        VBox imageUploadBox = new VBox(10);
+        ImageView imageView = new ImageView();
+        VBox imageUploadBox = new VBox();
         Label dragDropLabel = new Label("Drag and Drop Image Here");
         Button chooseFileButton = new Button("Choose Image");
         Label cropIdLabel = new Label("Select Crop:");
@@ -295,39 +297,49 @@ class SellerAddProductPage {
         Label errorLabel = new Label();
 
         File[] selectedImage = { null };
+        imageView.setFitWidth(200);
+        imageView.setFitHeight(200);
         imageUploadBox.setAlignment(Pos.CENTER);
         imageUploadBox
-                .setStyle("-fx-border-style: dashed; -fx-border-width: 2; -fx-border-color: #aaa; -fx-padding: 20;"); // Internal
-                                                                                                                      // style
-                                                                                                                      // css
-        imageUploadBox.getChildren().addAll(dragDropLabel, chooseFileButton);
+                .setStyle("-fx-border-style: dashed; -fx-border-width: 2; -fx-border-color: #aaa; -fx-padding: 20;");
+        imageUploadBox.getChildren().addAll(dragDropLabel, imageView, chooseFileButton);
 
-        // Drag and Drop functionality
         imageUploadBox.setOnDragOver(event -> {
-            if (event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(TransferMode.COPY);
+            if (event.getGestureSource() != imageUploadBox && event.getDragboard().hasFiles()) {
+                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }
-            event.consume();
-        });
-        imageUploadBox.setOnDragDropped(event -> {
-            File file = event.getDragboard().getFiles().get(0);
-            if (file != null && file.isFile()) {
-                dragDropLabel.setText(file.getName());
-                selectedImage[0] = file;
-            }
-            event.setDropCompleted(true);
             event.consume();
         });
 
-        // File chooser functionality
+        imageUploadBox.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            boolean success = false;
+            if (db.hasFiles()) {
+                selectedImageFile = db.getFiles().get(0);
+                ImageView newImageView = productRead.processAndLoadImage(selectedImageFile);
+                if (newImageView != null) {
+                    layout.getChildren().remove(imageView);
+                    imageView.setImage(newImageView.getImage());
+                }
+                success = true;
+            }
+            event.setDropCompleted(success);
+            event.consume();
+        });
+
+        // FileChooser Handler
         chooseFileButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Select Image");
             fileChooser.getExtensionFilters()
                     .add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
             File file = fileChooser.showOpenDialog(null);
             if (file != null) {
-                dragDropLabel.setText(file.getName());
-                selectedImage[0] = file;
+                selectedImageFile = file;
+                ImageView newImageView = productRead.processAndLoadImage(selectedImageFile);
+                if (newImageView != null) {
+                    imageView.setImage(newImageView.getImage());
+                }
             }
         });
 
@@ -382,6 +394,7 @@ class SellerEditProductPage {
     private final ProductRead productRead;
     private String username;
     private ProductDisplay product;
+    private File selectedImageFile = null;
 
     public SellerEditProductPage(String username, ProductDisplay product) {
         this.productUpdate = new ProductUpdate();
@@ -397,7 +410,10 @@ class SellerEditProductPage {
 
         Button backButton = new Button("Back");
         Label titleLabel = new Label("Edit Product");
-        ImageView imageView = product.getImageView(250, 200);
+        ImageView imageView = product.getImageView(200, 200);
+        VBox imageUploadBox = new VBox();
+        Label dragDropLabel = new Label("Drag and Drop Image Here");
+        Button chooseFileButton = new Button("Choose Image");
         Label cropNameLabel = new Label("Crop Name:");
         Label cropNameText = new Label(product.getCropName());
         Label quantityLabel = new Label("Quantity (kg):");
@@ -407,25 +423,73 @@ class SellerEditProductPage {
         Button saveButton = new Button("Save Changes");
         Label errorLabel = new Label();
 
+        imageUploadBox.setAlignment(Pos.CENTER);
+        imageUploadBox
+                .setStyle("-fx-border-style: dashed; -fx-border-width: 2; -fx-border-color: #aaa; -fx-padding: 20;");
+        imageUploadBox.getChildren().addAll(dragDropLabel, imageView, chooseFileButton);
+
+        imageUploadBox.setOnDragOver(event -> {
+            if (event.getGestureSource() != imageUploadBox && event.getDragboard().hasFiles()) {
+                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+            }
+            event.consume();
+        });
+
+        imageUploadBox.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            boolean success = false;
+            if (db.hasFiles()) {
+                selectedImageFile = db.getFiles().get(0);
+                ImageView newImageView = productRead.processAndLoadImage(selectedImageFile);
+                if (newImageView != null) {
+                    layout.getChildren().remove(imageView);
+                    imageView.setImage(newImageView.getImage());
+                }
+                success = true;
+            }
+            event.setDropCompleted(success);
+            event.consume();
+        });
+
+        // FileChooser Handler
+        chooseFileButton.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Select Image");
+            fileChooser.getExtensionFilters()
+                    .add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+            File file = fileChooser.showOpenDialog(null);
+            if (file != null) {
+                selectedImageFile = file;
+                ImageView newImageView = productRead.processAndLoadImage(selectedImageFile);
+                if (newImageView != null) {
+                    imageView.setImage(newImageView.getImage());
+                }
+            }
+        });
+
         quantityField.setText(Double.toString(product.getQuantity()));
         priceField.setText(Double.toString(product.getPricePerKg()));
         saveButton.setOnAction(e -> {
             String quantity = quantityField.getText();
             String price = priceField.getText();
 
-            productUpdate.updateQuantityPriceImage(product.getId(), quantity, price, errorLabel,
-                    new ProductUpdate.Callback() {
-                        @Override
-                        public void onSuccess() {
-                            AppFrames.showScene(new SellerShopPage(username).getScene());
-                        }
-                    });
+            try {
+                productUpdate.updateQuantityPriceImage(product.getId(), quantity, price, selectedImageFile, errorLabel,
+                        new ProductUpdate.Callback() {
+                            @Override
+                            public void onSuccess() {
+                                AppFrames.showScene(new SellerShopPage(username).getScene());
+                            }
+                        });
+            } catch (NumberFormatException | FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
         });
 
         errorLabel.getStyleClass().add("error-label");
         backButton.setOnAction(e -> AppFrames.showScene(new SellerShopPage(username).getScene()));
 
-        layout.getChildren().addAll(backButton, new Label(), titleLabel, imageView, cropNameLabel, cropNameText,
+        layout.getChildren().addAll(backButton, new Label(), titleLabel, imageUploadBox, cropNameLabel, cropNameText,
                 quantityLabel, quantityField, priceLabel, priceField, saveButton, errorLabel);
         return new Scene(layout, Global.WIDTH, Global.HEIGHT);
     }

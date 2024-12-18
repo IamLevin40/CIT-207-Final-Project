@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -171,8 +172,8 @@ public interface ProductService {
             this.dbHandler = new ProductDatabaseHandler();
         }
 
-        public void updateQuantityPriceImage(int id, String quantity, String price, Label errorLabel,
-                Callback callback) {
+        public void updateQuantityPriceImage(int id, String quantity, String price, File image, Label errorLabel,
+                Callback callback) throws NumberFormatException, FileNotFoundException {
             if (!validateAndSetError(validateHasCharacters("id", Integer.toString(id)), errorLabel))
                 return;
             if (!validateAndSetError(validateOnlyFloatDigitCharacters("id", Integer.toString(id)), errorLabel))
@@ -186,8 +187,13 @@ public interface ProductService {
                 return;
             if (!validateAndSetError(validateOnlyFloatDigitCharacters("price", price), errorLabel))
                 return;
+            if (!validateAndSetError(validateImageExist(image), errorLabel))
+                return;
+            if (!validateAndSetError(validateImageType(image), errorLabel))
+                return;
 
-            if (dbHandler.updateQuantityPriceImage(id, Double.parseDouble(quantity), Double.parseDouble(price))) {
+            if (dbHandler.updateQuantityPriceImage(id, Double.parseDouble(quantity), Double.parseDouble(price),
+                    image)) {
                 System.out.println("Product data updating successful.");
                 callback.onSuccess();
             } else {
@@ -243,6 +249,26 @@ public interface ProductService {
 
         public ProductRead() {
             this.dbHandler = new ProductDatabaseHandler();
+        }
+
+        public ProductDisplay getProductByIdForDisplay(int id) {
+            Map<String, Object> product = dbHandler.getFoodbankById(id);
+            int pId = (int) product.get("id");
+            String cropId = (String) product.get("crop_id");
+            double quantity = (double) product.get("quantity");
+            double pricePerKg = (double) product.get("price");
+            int discount = (int) product.get("discount");
+            String sellerId = (String) product.get("seller_id");
+
+            double actualPrice = computePrice(quantity, pricePerKg, 0);
+            double discountedPrice = computePrice(quantity, pricePerKg, discount);
+            ImageView imageView = loadImage(product.get("image"));
+
+            Map<String, Object> crop = dbHandler.getCropNameById(cropId);
+            String cropName = (String) crop.get("name");
+
+            return new ProductDisplay(pId, cropName, quantity, pricePerKg, discount, actualPrice, discountedPrice,
+                    imageView, sellerId);
         }
 
         public Map<String, String> getAllCrops() {
@@ -304,7 +330,7 @@ public interface ProductService {
             return getProductsForDisplay(rows);
         }
 
-        private double computePrice(double quantity, double pricePerKg, int discount) {
+        public double computePrice(double quantity, double pricePerKg, int discount) {
             double price;
             if (discount > 0) {
                 price = (pricePerKg * (0.01 * (100 - discount))) * quantity;
@@ -315,7 +341,7 @@ public interface ProductService {
             return Double.parseDouble(df.format(price));
         }
 
-        private ImageView loadImage(Object imageBlob) {
+        public ImageView loadImage(Object imageBlob) {
             if (imageBlob instanceof byte[]) {
                 Image originalImage = new Image(new ByteArrayInputStream((byte[]) imageBlob));
                 double originalWidth = originalImage.getWidth();
@@ -336,6 +362,16 @@ public interface ProductService {
                 return imageView;
             }
             return new ImageView();
+        }
+
+        public ImageView processAndLoadImage(File file) {
+            try {
+                byte[] imageBytes = Files.readAllBytes(file.toPath());
+                return loadImage(imageBytes);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                return null;
+            }
         }
     }
 }
