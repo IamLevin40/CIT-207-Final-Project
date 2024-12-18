@@ -171,27 +171,23 @@ public interface ProductService {
             this.dbHandler = new ProductDatabaseHandler();
         }
 
-        public void updateQuantityPriceImage(int id, double quantity, double price, File image, Label errorLabel,
+        public void updateQuantityPriceImage(int id, String quantity, String price, Label errorLabel,
                 Callback callback) {
             if (!validateAndSetError(validateHasCharacters("id", Integer.toString(id)), errorLabel))
                 return;
             if (!validateAndSetError(validateOnlyFloatDigitCharacters("id", Integer.toString(id)), errorLabel))
                 return;
-            if (!validateAndSetError(validateHasCharacters("quantity", Double.toString(quantity)), errorLabel))
+            if (!validateAndSetError(validateHasCharacters("quantity", quantity), errorLabel))
                 return;
-            if (!validateAndSetError(validateOnlyFloatDigitCharacters("quantity", Double.toString(quantity)),
+            if (!validateAndSetError(validateOnlyFloatDigitCharacters("quantity", quantity),
                     errorLabel))
                 return;
-            if (!validateAndSetError(validateHasCharacters("price", Double.toString(price)), errorLabel))
+            if (!validateAndSetError(validateHasCharacters("price", price), errorLabel))
                 return;
-            if (!validateAndSetError(validateOnlyFloatDigitCharacters("price", Double.toString(price)), errorLabel))
-                return;
-            if (!validateAndSetError(validateImageExist(image), errorLabel))
-                return;
-            if (!validateAndSetError(validateImageType(image), errorLabel))
+            if (!validateAndSetError(validateOnlyFloatDigitCharacters("price", price), errorLabel))
                 return;
 
-            if (dbHandler.updateQuantityPriceImage(id, quantity, price, image)) {
+            if (dbHandler.updateQuantityPriceImage(id, Double.parseDouble(quantity), Double.parseDouble(price))) {
                 System.out.println("Product data updating successful.");
                 callback.onSuccess();
             } else {
@@ -281,7 +277,8 @@ public interface ProductService {
                 String cropName = (String) crop.get("name");
 
                 productDisplays.add(
-                        new ProductDisplay(id, cropName, quantity, actualPrice, discountedPrice, imageView, sellerId));
+                        new ProductDisplay(id, cropName, quantity, pricePerKg, discount, actualPrice, discountedPrice,
+                                imageView, sellerId));
             }
 
             return productDisplays;
