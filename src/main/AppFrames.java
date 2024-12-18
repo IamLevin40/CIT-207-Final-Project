@@ -18,7 +18,7 @@ public class AppFrames extends Application {
     @Override
     public void start(Stage stage) {
         this.stage = stage;
-        showScene(new MainMenu().getScene());
+        showScene(new Start().getScene());
     }
 
     public static void showScene(Scene scene) {

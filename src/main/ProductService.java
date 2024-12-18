@@ -3,13 +3,21 @@ package main;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javafx.scene.control.*;
 import javafx.scene.image.*;
@@ -372,6 +380,88 @@ public interface ProductService {
                 ex.printStackTrace();
                 return null;
             }
+        }
+    }
+
+    public static class ProductCartManager implements ProductService {
+        private static final String CART_FILE = "data/cart_data.txt";
+
+        public void addToCart(String username, int productId) {
+            Map<String, Set<String>> cartData = loadCartData();
+
+            cartData.putIfAbsent(username, new HashSet<>());
+            if (cartData.get(username).add(Integer.toString(productId))) {
+                saveCartData(cartData);
+                System.out.println("Added product " + productId + " to " + username + "'s cart.");
+            } else {
+                System.out.println("Product " + productId + " is already in " + username + "'s cart.");
+            }
+        }
+
+        public List<Integer> getProductIds(String username) {
+            Map<String, Set<String>> cartData = loadCartData();
+            Set<String> productIds = cartData.getOrDefault(username, Collections.emptySet());
+
+            // Convert product IDs from Strings to Integers
+            List<Integer> integerProductIds = new ArrayList<>();
+            for (String productId : productIds) {
+                try {
+                    integerProductIds.add(Integer.parseInt(productId));
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid product ID format: " + productId);
+                }
+            }
+            return integerProductIds;
+        }
+
+        public void deleteProduct(String username, int productId) {
+            Map<String, Set<String>> cartData = loadCartData();
+
+            if (cartData.containsKey(username)) {
+                Set<String> productIds = cartData.get(username);
+                String productIdStr = String.valueOf(productId);
+
+                if (productIds.remove(productIdStr)) {
+                    saveCartData(cartData);
+                    System.out.println("Removed product " + productId + " from " + username + "'s cart.");
+                } else {
+                    System.out.println("Product " + productId + " not found in " + username + "'s cart.");
+                }
+            } else {
+                System.out.println("No cart found for username: " + username);
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        private Map<String, Set<String>> loadCartData() {
+            Map<String, Set<String>> cartData = new HashMap<>();
+            File file = new File(CART_FILE);
+
+            if (file.exists() && file.length() > 0) {
+                try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                    Object data = ois.readObject();
+                    if (data instanceof Map) {
+                        cartData = (Map<String, Set<String>>) data;
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    System.err.println("Error reading cart data: " + e.getMessage());
+                }
+            }
+
+            return cartData;
+        }
+
+        private void saveCartData(Map<String, Set<String>> cartData) {
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(CART_FILE))) {
+                oos.writeObject(cartData);
+            } catch (IOException e) {
+                System.err.println("Error saving cart data: " + e.getMessage());
+            }
+        }
+
+        public Set<String> getUserCart(String username) {
+            Map<String, Set<String>> cartData = loadCartData();
+            return cartData.getOrDefault(username, new HashSet<>());
         }
     }
 }

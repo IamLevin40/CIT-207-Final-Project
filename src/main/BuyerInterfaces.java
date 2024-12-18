@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import main.ProductService.ProductCartManager;
 import main.ProductService.ProductRead;
 
 import java.util.List;
@@ -20,10 +21,12 @@ import utils.Global;
 //
 class BuyerHomePage {
     private final ProductRead productRead;
+    private final ProductCartManager productCartManager;
     private String username;
 
     public BuyerHomePage(String username) {
         this.productRead = new ProductRead();
+        this.productCartManager = new ProductCartManager();
         this.username = username;
     }
 
@@ -73,7 +76,16 @@ class BuyerHomePage {
             ImageView imageView = product.getImageView(80, 80);
             Label cropIdLabel = new Label(product.getCropName());
             Label quantityLabel = new Label(product.getQuantity() + " kg");
+
+            HBox sellerBox = new HBox(30);
+            sellerBox.setAlignment(Pos.CENTER_LEFT);
             Label sellerLabel = new Label("@" + product.getSellerId());
+            Button addToCartButton = new Button("+");
+
+            addToCartButton.setStyle(
+                    "-fx-background-color:rgb(33, 197, 118); -fx-text-fill: white; -fx-padding: 0 10; -fx-border-radius: 5; -fx-background-radius: 5;");
+            addToCartButton.setOnAction(e -> productCartManager.addToCart(username, product.getId()));
+            sellerBox.getChildren().addAll(sellerLabel, addToCartButton);
 
             Text discountedPriceText = new Text("₱ " + product.getDiscountedPrice() + " ");
             TextFlow priceFlow;
@@ -87,7 +99,7 @@ class BuyerHomePage {
                 priceFlow = new TextFlow(discountedPriceText);
             }
 
-            productBox.getChildren().addAll(imageView, cropIdLabel, quantityLabel, priceFlow, sellerLabel);
+            productBox.getChildren().addAll(imageView, cropIdLabel, quantityLabel, priceFlow, sellerBox);
 
             int row = i / columnCount;
             int col = i % columnCount;
@@ -110,7 +122,16 @@ class BuyerHomePage {
             ImageView imageView = product.getImageView(80, 80);
             Label cropIdLabel = new Label(product.getCropName());
             Label quantityLabel = new Label(product.getQuantity() + " kg");
+
+            HBox sellerBox = new HBox(30);
+            sellerBox.setAlignment(Pos.CENTER_LEFT);
             Label sellerLabel = new Label("@" + product.getSellerId());
+            Button addToCartButton = new Button("+");
+
+            addToCartButton.setStyle(
+                    "-fx-background-color:rgb(33, 197, 118); -fx-text-fill: white; -fx-padding: 0 10; -fx-border-radius: 5; -fx-background-radius: 5;");
+            addToCartButton.setOnAction(e -> productCartManager.addToCart(username, product.getId()));
+            sellerBox.getChildren().addAll(sellerLabel, addToCartButton);
 
             Text discountedPriceText = new Text("₱ " + product.getDiscountedPrice() + " ");
             TextFlow priceFlow;
@@ -124,7 +145,7 @@ class BuyerHomePage {
                 priceFlow = new TextFlow(discountedPriceText);
             }
 
-            productBox.getChildren().addAll(imageView, cropIdLabel, quantityLabel, priceFlow, sellerLabel);
+            productBox.getChildren().addAll(imageView, cropIdLabel, quantityLabel, priceFlow, sellerBox);
 
             int row = i / columnCount;
             int col = i % columnCount;
@@ -147,11 +168,13 @@ class BuyerHomePage {
 //
 class BuyerPopularPage {
     private final ProductRead productRead;
+    private final ProductCartManager productCartManager;
     private String username;
 
     public BuyerPopularPage(String username) {
-        this.username = username;
         this.productRead = new ProductRead();
+        this.productCartManager = new ProductCartManager();
+        this.username = username;
     }
 
     public Scene getScene() {
@@ -185,7 +208,16 @@ class BuyerPopularPage {
             ImageView imageView = product.getImageView(130, 130);
             Label cropIdLabel = new Label(product.getCropName());
             Label quantityLabel = new Label(product.getQuantity() + " kg");
+
+            HBox sellerBox = new HBox(30);
+            sellerBox.setAlignment(Pos.CENTER_LEFT);
             Label sellerLabel = new Label("@" + product.getSellerId());
+            Button addToCartButton = new Button("+");
+
+            addToCartButton.setStyle(
+                    "-fx-background-color:rgb(33, 197, 118); -fx-text-fill: white; -fx-padding: 0 10; -fx-border-radius: 5; -fx-background-radius: 5;");
+            addToCartButton.setOnAction(e -> productCartManager.addToCart(username, product.getId()));
+            sellerBox.getChildren().addAll(sellerLabel, addToCartButton);
 
             Text discountedPriceText = new Text("₱ " + product.getDiscountedPrice() + " ");
             TextFlow priceFlow;
@@ -199,7 +231,7 @@ class BuyerPopularPage {
                 priceFlow = new TextFlow(discountedPriceText);
             }
 
-            productBox.getChildren().addAll(imageView, cropIdLabel, quantityLabel, priceFlow, sellerLabel);
+            productBox.getChildren().addAll(imageView, cropIdLabel, quantityLabel, priceFlow, sellerBox);
 
             int row = i / columnCount;
             int col = i % columnCount;
@@ -222,11 +254,13 @@ class BuyerPopularPage {
 //
 class BuyerPromoPage {
     private final ProductRead productRead;
+    private final ProductCartManager productCartManager;
     private String username;
 
     public BuyerPromoPage(String username) {
-        this.username = username;
         this.productRead = new ProductRead();
+        this.productCartManager = new ProductCartManager();
+        this.username = username;
     }
 
     public Scene getScene() {
@@ -260,7 +294,16 @@ class BuyerPromoPage {
             ImageView imageView = product.getImageView(130, 130);
             Label cropIdLabel = new Label(product.getCropName());
             Label quantityLabel = new Label(product.getQuantity() + " kg");
+
+            HBox sellerBox = new HBox(30);
+            sellerBox.setAlignment(Pos.CENTER_LEFT);
             Label sellerLabel = new Label("@" + product.getSellerId());
+            Button addToCartButton = new Button("+");
+
+            addToCartButton.setStyle(
+                    "-fx-background-color:rgb(33, 197, 118); -fx-text-fill: white; -fx-padding: 0 10; -fx-border-radius: 5; -fx-background-radius: 5;");
+            addToCartButton.setOnAction(e -> productCartManager.addToCart(username, product.getId()));
+            sellerBox.getChildren().addAll(sellerLabel, addToCartButton);
 
             Text discountedPriceText = new Text("₱ " + product.getDiscountedPrice() + " ");
             TextFlow priceFlow;
@@ -274,7 +317,7 @@ class BuyerPromoPage {
                 priceFlow = new TextFlow(discountedPriceText);
             }
 
-            productBox.getChildren().addAll(imageView, cropIdLabel, quantityLabel, priceFlow, sellerLabel);
+            productBox.getChildren().addAll(imageView, cropIdLabel, quantityLabel, priceFlow, sellerBox);
 
             int row = i / columnCount;
             int col = i % columnCount;
@@ -297,13 +340,15 @@ class BuyerPromoPage {
 //
 class BuyerSearchPage {
     private final ProductRead productRead;
+    private final ProductCartManager productCartManager;
     private String username;
     private String searchQuery;
 
     public BuyerSearchPage(String username, String searchQuery) {
+        this.productRead = new ProductRead();
+        this.productCartManager = new ProductCartManager();
         this.username = username;
         this.searchQuery = searchQuery;
-        this.productRead = new ProductRead();
     }
 
     public Scene getScene() {
@@ -341,7 +386,16 @@ class BuyerSearchPage {
             ImageView imageView = product.getImageView(130, 130);
             Label cropIdLabel = new Label(product.getCropName());
             Label quantityLabel = new Label(product.getQuantity() + " kg");
+
+            HBox sellerBox = new HBox(30);
+            sellerBox.setAlignment(Pos.CENTER_LEFT);
             Label sellerLabel = new Label("@" + product.getSellerId());
+            Button addToCartButton = new Button("+");
+
+            addToCartButton.setStyle(
+                    "-fx-background-color:rgb(33, 197, 118); -fx-text-fill: white; -fx-padding: 0 10; -fx-border-radius: 5; -fx-background-radius: 5;");
+            addToCartButton.setOnAction(e -> productCartManager.addToCart(username, product.getId()));
+            sellerBox.getChildren().addAll(sellerLabel, addToCartButton);
 
             Text discountedPriceText = new Text("₱ " + product.getDiscountedPrice() + " ");
             TextFlow priceFlow;
@@ -355,7 +409,7 @@ class BuyerSearchPage {
                 priceFlow = new TextFlow(discountedPriceText);
             }
 
-            productBox.getChildren().addAll(imageView, cropIdLabel, quantityLabel, priceFlow, sellerLabel);
+            productBox.getChildren().addAll(imageView, cropIdLabel, quantityLabel, priceFlow, sellerBox);
 
             int row = i / columnCount;
             int col = i % columnCount;
@@ -391,12 +445,40 @@ class BuyerProfilePage {
         Button backButton = new Button("Back");
         Label profileLabel = new Label("Profile");
         Label welcomeLabel = new Label("Welcome, " + username);
+        Button cartPageButton = new Button("My Cart");
         Button logOutButton = new Button("Log Out");
 
-        backButton.setOnAction(e -> AppFrames.showScene(new BuyerHomePage(username).getScene()));
+        cartPageButton.setOnAction(e -> AppFrames.showScene(new BuyerCartPage(username).getScene()));
         logOutButton.setOnAction(e -> AppFrames.showScene(new MainMenu().getScene()));
+        backButton.setOnAction(e -> AppFrames.showScene(new BuyerHomePage(username).getScene()));
 
-        layout.getChildren().addAll(backButton, profileLabel, new Label(), welcomeLabel, logOutButton);
+        layout.getChildren().addAll(backButton, profileLabel, new Label(), welcomeLabel, cartPageButton, logOutButton);
+        return new Scene(layout, Global.WIDTH, Global.HEIGHT);
+    }
+}
+
+//
+// Buyer Cart Page
+// Displays products that were added to cart from the system
+//
+class BuyerCartPage {
+    private String username;
+
+    public BuyerCartPage(String username) {
+        this.username = username;
+    }
+
+    public Scene getScene() {
+        VBox layout = new VBox();
+        layout.setAlignment(Pos.TOP_CENTER);
+        layout.getStyleClass().add("product-frame");
+
+        Button backButton = new Button("Back");
+        Label titleLabel = new Label("Cart Page");
+
+        backButton.setOnAction(e -> AppFrames.showScene(new BuyerProfilePage(username).getScene()));
+
+        layout.getChildren().addAll(backButton, titleLabel);
         return new Scene(layout, Global.WIDTH, Global.HEIGHT);
     }
 }
