@@ -14,6 +14,10 @@
             "request": "launch",
             "mainClass": "main.Main",
             "projectName": "CIT-207-Final-Project_191dd2ae"
+            "name": "AppFrames",
+            "request": "launch",
+            "mainClass": "main.AppFrames",
+            "projectName": "CIT-207-Final-Project_2fc91172"
         },
         {
             "type": "java",
