@@ -4,51 +4,16 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-<
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
-// for images:
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
+// for images:
+import javafx.scene.image.ImageView;
 
 import main.UserService.BuyerService;
 import main.UserService.SellerService;
 import utils.NumberTextField;
 
-
 import data.RegionCityData;
 import utils.Global;
-
-
-//
-
-// Set up javafx scenes for account form page
-//
-public class AccountFormPage extends Application {
-    private static Stage stage;
-
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-    @SuppressWarnings("static-access")
-    @Override
-    public void start(Stage stage) {
-        this.stage = stage;
-        showScene(new Start().getScene()); // uncomment later
-        // showScene(new SellerLoginFrame(null).getScene());
-    }
-
-    public static void showScene(Scene scene) {
-        scene.getStylesheets().add("styles.css"); // Link the CSS file here
-        stage.setScene(scene);
-        stage.centerOnScreen();
-        stage.show();
-        stage.setTitle("Foodai");
-    }
-}
-
 
 // START SCREEN
 class Start {
@@ -62,14 +27,13 @@ class Start {
         iv.setFitHeight(291);
         iv.setFitWidth(300);
 
-        // welcome to 
+        // welcome to
         Label welcome = new Label("Welcome to");
         welcome.getStyleClass().add("text-welcome");
 
         // foodai
         Label foodai = new Label("Foodai");
         foodai.getStyleClass().add("text-foodai");
-
 
         Button loginEmail = new Button("Log in with email"); // Button to refer to seller login frame
         loginEmail.getStyleClass().add("login-email");
@@ -94,26 +58,23 @@ class Start {
         Button fbBtn = new Button();
         fbBtn.getStyleClass().add("facebook-btn");
 
-
         buttonContainer.getChildren().addAll(googleBtn, appleBtn, twitterBtn, fbBtn); // Add buttons to container
 
         // ============================================= //
- 
+
         // Add event listener for buttons
-        loginEmail.setOnAction(e -> AccountFormPage.showScene(new MainMenu().getScene()));
-        googleBtn.setOnAction(e -> AccountFormPage.showScene(new MainMenu().getScene()));
-        appleBtn.setOnAction(e -> AccountFormPage.showScene(new MainMenu().getScene()));
-        twitterBtn.setOnAction(e -> AccountFormPage.showScene(new MainMenu().getScene()));
-        fbBtn.setOnAction(e -> AccountFormPage.showScene(new MainMenu().getScene()));
-       
+        loginEmail.setOnAction(e -> AppFrames.showScene(new MainMenu().getScene()));
+        googleBtn.setOnAction(e -> AppFrames.showScene(new MainMenu().getScene()));
+        appleBtn.setOnAction(e -> AppFrames.showScene(new MainMenu().getScene()));
+        twitterBtn.setOnAction(e -> AppFrames.showScene(new MainMenu().getScene()));
+        fbBtn.setOnAction(e -> AppFrames.showScene(new MainMenu().getScene()));
 
         // Add components to the layout
-        layout.getChildren().addAll(iv, welcome, foodai, loginEmail, or,  buttonContainer);
+        layout.getChildren().addAll(iv, welcome, foodai, loginEmail, or, buttonContainer);
 
         return new Scene(layout, Global.WIDTH, Global.HEIGHT);
-    }   
+    }
 }
-
 
 //
 
@@ -126,14 +87,12 @@ class MainMenu {
         layout.setAlignment(Pos.CENTER); // Set alignment of layout to center
         layout.getStyleClass().add("main-menu"); // Add .main-menu style to layout
 
-
-         // welcome to 
+        // welcome to
         Label welcome = new Label("Welcome to");
         welcome.getStyleClass().add("text-welcome");
         // foodai
         Label foodai = new Label("Foodai");
         foodai.getStyleClass().add("text-foodai_menu");
-
 
         Label menuLabel = new Label("Please select the role that fits you");
         menuLabel.getStyleClass().add("menu-label");
@@ -143,26 +102,14 @@ class MainMenu {
 
         Label or = new Label("OR");
         or.getStyleClass().add("text-or_menu");
-    
+
         Button buyerButton = new Button("Buyer"); // Button to refer to buyer login frame
         buyerButton.getStyleClass().add("buyer-btn");
 
         Button exitButton = new Button("Exit"); // Exit button
         exitButton.getStyleClass().add("exit-btn");
 
-
         // Set up database
-
-        DatabaseHandler sellerDbHandler = new SellerDatabaseHandler();
-        DatabaseHandler buyerDbHandler = new BuyerDatabaseHandler();
-        UserService.SellerService sellerService = new UserService.SellerService(sellerDbHandler);
-        UserService.BuyerService buyerService = new BuyerService(buyerDbHandler);
-
-        // Add event listener for buttons
-        sellerButton.setOnAction(e -> AccountFormPage.showScene(new SellerLoginFrame(sellerService).getScene()));
-        buyerButton.setOnAction(e -> AccountFormPage.showScene(new BuyerLoginFrame(buyerService).getScene()));
-        // exitButton.setOnAction(e -> System.exit(0));
-
         UserService.SellerService sellerService = new UserService.SellerService();
         UserService.BuyerService buyerService = new UserService.BuyerService();
 
@@ -171,9 +118,8 @@ class MainMenu {
         buyerButton.setOnAction(e -> AppFrames.showScene(new BuyerLoginFrame(buyerService).getScene()));
         exitButton.setOnAction(e -> System.exit(0));
 
-
         // Add components to the layout
-        layout.getChildren().addAll(welcome, foodai, menuLabel, sellerButton, or, buyerButton);
+        layout.getChildren().addAll(welcome, foodai, menuLabel, sellerButton, buyerButton);
 
         return new Scene(layout, Global.WIDTH, Global.HEIGHT);
     }
@@ -227,9 +173,8 @@ class SellerLoginFrame {
 
         // Add components to the layout
         layout.getChildren().addAll(
-            backButton, usernameLabel, usernameField, passwordLabel, passwordField,
-               loginButton, registerButton, errorLabel
-            );
+                backButton, usernameLabel, usernameField, passwordLabel, passwordField,
+                loginButton, registerButton, errorLabel);
 
         return new Scene(layout, Global.WIDTH, Global.HEIGHT);
     }

@@ -267,7 +267,7 @@ class SellerAddProductPage {
     private final ProductCreate productCreate;
     private final ProductRead productRead;
     private String username;
-    private File selectedImageFile = null;
+    private File selectedImage = null;
 
     public SellerAddProductPage(String username) {
         this.productCreate = new ProductCreate();
@@ -296,7 +296,6 @@ class SellerAddProductPage {
         Button addProductButton = new Button("Add Product");
         Label errorLabel = new Label();
 
-        File[] selectedImage = { null };
         imageView.setFitWidth(200);
         imageView.setFitHeight(200);
         imageUploadBox.setAlignment(Pos.CENTER);
@@ -315,8 +314,8 @@ class SellerAddProductPage {
             Dragboard db = event.getDragboard();
             boolean success = false;
             if (db.hasFiles()) {
-                selectedImageFile = db.getFiles().get(0);
-                ImageView newImageView = productRead.processAndLoadImage(selectedImageFile);
+                selectedImage = db.getFiles().get(0);
+                ImageView newImageView = productRead.processAndLoadImage(selectedImage);
                 if (newImageView != null) {
                     layout.getChildren().remove(imageView);
                     imageView.setImage(newImageView.getImage());
@@ -335,8 +334,8 @@ class SellerAddProductPage {
                     .add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
             File file = fileChooser.showOpenDialog(null);
             if (file != null) {
-                selectedImageFile = file;
-                ImageView newImageView = productRead.processAndLoadImage(selectedImageFile);
+                selectedImage = file;
+                ImageView newImageView = productRead.processAndLoadImage(selectedImage);
                 if (newImageView != null) {
                     imageView.setImage(newImageView.getImage());
                 }
@@ -355,7 +354,7 @@ class SellerAddProductPage {
             boolean isPopular = false;
 
             try {
-                productCreate.addFoodbank(cropId, quantity, price, discount, isPopular, selectedImage[0], username,
+                productCreate.addFoodbank(cropId, quantity, price, discount, isPopular, selectedImage, username,
                         errorLabel, new ProductService.Callback() {
                             @Override
                             public void onSuccess() {
@@ -394,7 +393,7 @@ class SellerEditProductPage {
     private final ProductRead productRead;
     private String username;
     private ProductDisplay product;
-    private File selectedImageFile = null;
+    private File selectedImage = null;
 
     public SellerEditProductPage(String username, ProductDisplay product) {
         this.productUpdate = new ProductUpdate();
@@ -439,8 +438,8 @@ class SellerEditProductPage {
             Dragboard db = event.getDragboard();
             boolean success = false;
             if (db.hasFiles()) {
-                selectedImageFile = db.getFiles().get(0);
-                ImageView newImageView = productRead.processAndLoadImage(selectedImageFile);
+                selectedImage = db.getFiles().get(0);
+                ImageView newImageView = productRead.processAndLoadImage(selectedImage);
                 if (newImageView != null) {
                     layout.getChildren().remove(imageView);
                     imageView.setImage(newImageView.getImage());
@@ -459,8 +458,8 @@ class SellerEditProductPage {
                     .add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
             File file = fileChooser.showOpenDialog(null);
             if (file != null) {
-                selectedImageFile = file;
-                ImageView newImageView = productRead.processAndLoadImage(selectedImageFile);
+                selectedImage = file;
+                ImageView newImageView = productRead.processAndLoadImage(selectedImage);
                 if (newImageView != null) {
                     imageView.setImage(newImageView.getImage());
                 }
@@ -474,8 +473,8 @@ class SellerEditProductPage {
             String price = priceField.getText();
 
             try {
-                productUpdate.updateQuantityPriceImage(product.getId(), quantity, price, selectedImageFile, errorLabel,
-                        new ProductUpdate.Callback() {
+                productUpdate.updateQuantityPriceImage(product.getId(), quantity, price, selectedImage, errorLabel,
+                        new ProductService.Callback() {
                             @Override
                             public void onSuccess() {
                                 AppFrames.showScene(new SellerShopPage(username).getScene());
