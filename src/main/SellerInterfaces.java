@@ -39,41 +39,65 @@ class SellerHomePage {
     }
 
     public Scene getScene() {
-        VBox layout = new VBox();
-        layout.setAlignment(Pos.TOP_CENTER);
-        layout.getStyleClass().add("product-frame");
+    BorderPane borderPane = new BorderPane();
+    
+    // Content container
+    VBox content = new VBox(10);
+    content.setAlignment(Pos.TOP_CENTER);
+    content.getStyleClass().add("product-frame");
+    
+    // Add spacer to push content up
+    Region spacer = new Region();
+    VBox.setVgrow(spacer, Priority.ALWAYS);
+    
+    // Create footer
+    HBox footer = new HBox();
+    footer.setAlignment(Pos.CENTER);
+    footer.setPadding(new Insets(10));
+    footer.getStyleClass().add("footer-css");
+    footer.setMinHeight(50);
+    
+    Button profileButton = new Button("");
+    profileButton.setOnAction(e -> AppFrames.showScene(new SellerProfilePage(username).getScene()));
+    profileButton.getStyleClass().add("profile-btn");
+    
 
-        // Content container
-        VBox content = new VBox();
-        content.setAlignment(Pos.TOP_CENTER);
-        
-        // Create footer
-        HBox footer = new HBox();
-        footer.setAlignment(Pos.CENTER);
-        footer.setPadding(new Insets(10));
-        footer.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;");
-        
-        Button profileButton = new Button("Profile");
-        profileButton.setOnAction(e -> AppFrames.showScene(new SellerProfilePage(username).getScene()));
-        
-        footer.getChildren().add(profileButton);
+    Label welcomeLabel = new Label("Welcome, " + username);
+    Label popularTitleLabel = new Label("Popular Products");
+    GridPane popularGridPane = createGridPane();
+    Label promoSaleTitleLabel = new Label("Promo Sale");
+    GridPane promoSaleGridPane = createGridPane();
 
-        Label welcomeLabel = new Label("Welcome, " + username);
-        Label popularTitleLabel = new Label("Popular Products");
-        GridPane popularGridPane = createGridPane();
-        Label promoSaleTitleLabel = new Label("Promo Sale");
-        GridPane promoSaleGridPane = createGridPane();
+    displayPopularProducts(popularGridPane);
+    displayDiscountedProducts(promoSaleGridPane);
 
-        displayPopularProducts(popularGridPane);
-        displayDiscountedProducts(promoSaleGridPane);
+    
+    content.getChildren().addAll(
+        welcomeLabel, 
+        popularTitleLabel, 
+        popularGridPane,
+        promoSaleTitleLabel, 
+        promoSaleGridPane,
+        spacer
+    );
 
-        content.getChildren().addAll(new Label(), welcomeLabel, new Label(), popularTitleLabel, popularGridPane,
-                new Label(), promoSaleTitleLabel, promoSaleGridPane, new Label());
+    // in HOME: so should not do anything. Give ACTIVE status style
+    Button homeBtn = new Button("");
+    homeBtn.getStyleClass().add("home-btn-active");
 
-        layout.getChildren().addAll(content, footer);
+    Button addBtn = new Button("");
+    addBtn.setOnAction(e -> AppFrames.showScene(new SellerShopPage(username).getScene()));
+    addBtn.getStyleClass().add("add-btn");
 
-        return new Scene(layout, Global.WIDTH, Global.HEIGHT);
-    }
+    // FOOTER ORDER
+    footer.getChildren().addAll(homeBtn, addBtn, profileButton);
+
+    // Set BorderPane sections
+    borderPane.setCenter(content);
+    borderPane.setBottom(footer);
+
+    return new Scene(borderPane, Global.WIDTH, Global.HEIGHT);
+}
 
     private void displayPopularProducts(GridPane gridPane) {
         gridPane.getChildren().clear();
@@ -170,22 +194,50 @@ class SellerProfilePage {
     }
 
     public Scene getScene() {
-        VBox layout = new VBox();
-        layout.setAlignment(Pos.TOP_CENTER);
-        layout.getStyleClass().add("product-frame");
+        BorderPane borderPane = new BorderPane();
 
-        Button backButton = new Button("Back");
+        // Main content
+        VBox content = new VBox(10);
+        content.setAlignment(Pos.TOP_CENTER);
+        content.getStyleClass().add("product-frame");
+
+        Button backButton = new Button("Home");
         Label profileLabel = new Label("Profile");
         Label welcomeLabel = new Label("Welcome, " + username);
         Button shopPageButton = new Button("My Shop");
         Button logOutButton = new Button("Log Out");
 
+        // Add spacer to push content up
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
+
         shopPageButton.setOnAction(e -> AppFrames.showScene(new SellerShopPage(username).getScene()));
+
         backButton.setOnAction(e -> AppFrames.showScene(new SellerHomePage(username).getScene()));
         logOutButton.setOnAction(e -> AppFrames.showScene(new MainMenu().getScene()));
 
-        layout.getChildren().addAll(backButton, profileLabel, new Label(), welcomeLabel, shopPageButton, logOutButton);
-        return new Scene(layout, Global.WIDTH, Global.HEIGHT);
+        content.getChildren().addAll(backButton, profileLabel, new Label(), welcomeLabel, shopPageButton, logOutButton, spacer);
+
+        // Create footer
+        HBox footer = new HBox();
+        footer.setAlignment(Pos.CENTER);
+        footer.setPadding(new Insets(10));
+        footer.getStyleClass().add("footer-css");
+        footer.setMinHeight(50);
+        
+        // in Profile: so should not do anything. Give ACTIVE status style
+        Button profileButton = new Button("Profile");
+        // profileButton.setOnAction(e -> AppFrames.showScene(new SellerProfilePage(username).getScene()));
+        // footer.getChildren().add(profileButton);
+
+        // backButton is HOME
+        footer.getChildren().addAll(backButton, profileButton);
+
+        // Set BorderPane sections
+        borderPane.setCenter(content);
+        borderPane.setBottom(footer);
+
+        return new Scene(borderPane, Global.WIDTH, Global.HEIGHT);
     }
 }
 
