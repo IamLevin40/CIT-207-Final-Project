@@ -1,5 +1,7 @@
 package utils;
 
+import java.text.DecimalFormat;
+
 import javafx.scene.image.ImageView;
 
 public class ProductDisplay {
@@ -12,16 +14,17 @@ public class ProductDisplay {
     private final double discountedPrice;
     private final ImageView imageView;
     private final String sellerId;
+    private DecimalFormat df = new DecimalFormat("#.##");
 
     public ProductDisplay(int id, String cropName, double quantity, double pricePerKg, int discount, double actualPrice,
             double discountedPrice, ImageView imageView, String sellerId) {
         this.id = id;
         this.cropName = cropName;
-        this.quantity = quantity;
-        this.pricePerKg = pricePerKg;
-        this.discount = discount;
-        this.actualPrice = actualPrice;
-        this.discountedPrice = discountedPrice;
+        this.quantity = Double.parseDouble(df.format(quantity));
+        this.pricePerKg = Double.parseDouble(df.format(pricePerKg));
+        this.discount = Integer.parseInt(df.format(discount));
+        this.actualPrice = Double.parseDouble(df.format(actualPrice));
+        this.discountedPrice = Double.parseDouble(df.format(discountedPrice));
         this.imageView = imageView;
         this.sellerId = sellerId;
     }
@@ -35,23 +38,23 @@ public class ProductDisplay {
     }
 
     public double getQuantity() {
-        return quantity;
+        return Double.parseDouble(df.format(quantity));
     }
 
     public double getPricePerKg() {
-        return pricePerKg;
+        return Double.parseDouble(df.format(pricePerKg));
     }
 
     public int getDiscount() {
-        return discount;
+        return Integer.parseInt(df.format(discount));
     }
 
     public double getActualPrice() {
-        return actualPrice;
+        return Double.parseDouble(df.format(actualPrice));
     }
 
     public double getDiscountedPrice() {
-        return discountedPrice;
+        return Double.parseDouble(df.format(discountedPrice));
     }
 
     public ImageView getImage() {

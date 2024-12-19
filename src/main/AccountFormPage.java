@@ -121,7 +121,7 @@ class MainMenu {
         exitButton.setOnAction(e -> System.exit(0));
 
         // Add components to the layout
-        layout.getChildren().addAll(welcome, foodai, menuLabel, sellerButton, or, buyerButton);
+        layout.getChildren().addAll(welcome, foodai, menuLabel, sellerButton, buyerButton);
 
         return new Scene(layout, Global.WIDTH, Global.HEIGHT);
     }
