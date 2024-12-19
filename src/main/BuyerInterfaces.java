@@ -10,6 +10,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import main.ProductService.ProductCartManager;
 import main.ProductService.ProductDelete;
+
 import main.ProductService.ProductRead;
 import main.ProductService.ProductUpdate;
 
@@ -86,6 +87,8 @@ class BuyerHomePage {
 
             HBox sellerBox = new HBox(30);
             sellerBox.setAlignment(Pos.CENTER_LEFT);
+
+            
             Label sellerLabel = new Label("@" + product.getSellerId());
             Button addToCartButton = new Button("+");
 
@@ -93,6 +96,8 @@ class BuyerHomePage {
                     "-fx-background-color:rgb(33, 197, 118); -fx-text-fill: white; -fx-padding: 0 10; -fx-border-radius: 5; -fx-background-radius: 5;");
             addToCartButton.setOnAction(e -> productCartManager.addToCart(username, product.getId()));
             sellerBox.getChildren().addAll(sellerLabel, addToCartButton);
+           
+
 
             Text discountedPriceText = new Text("₱ " + product.getDiscountedPrice() + " ");
             TextFlow priceFlow;
@@ -132,6 +137,8 @@ class BuyerHomePage {
 
             HBox sellerBox = new HBox(30);
             sellerBox.setAlignment(Pos.CENTER_LEFT);
+
+            
             Label sellerLabel = new Label("@" + product.getSellerId());
             Button addToCartButton = new Button("+");
 
@@ -139,6 +146,9 @@ class BuyerHomePage {
                     "-fx-background-color:rgb(33, 197, 118); -fx-text-fill: white; -fx-padding: 0 10; -fx-border-radius: 5; -fx-background-radius: 5;");
             addToCartButton.setOnAction(e -> productCartManager.addToCart(username, product.getId()));
             sellerBox.getChildren().addAll(sellerLabel, addToCartButton);
+           
+
+            
 
             Text discountedPriceText = new Text("₱ " + product.getDiscountedPrice() + " ");
             TextFlow priceFlow;
@@ -181,6 +191,7 @@ class BuyerPopularPage {
     public BuyerPopularPage(String username) {
         this.productRead = new ProductRead();
         this.productCartManager = new ProductCartManager();
+        this.username = username;
         this.username = username;
     }
 

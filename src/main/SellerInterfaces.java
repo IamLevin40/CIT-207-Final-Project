@@ -1,5 +1,6 @@
 package main;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -42,19 +43,35 @@ class SellerHomePage {
         layout.setAlignment(Pos.TOP_CENTER);
         layout.getStyleClass().add("product-frame");
 
+        // Content container
+        VBox content = new VBox();
+        content.setAlignment(Pos.TOP_CENTER);
+        
+        // Create footer
+        HBox footer = new HBox();
+        footer.setAlignment(Pos.CENTER);
+        footer.setPadding(new Insets(10));
+        footer.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;");
+        
+        Button profileButton = new Button("Profile");
+        profileButton.setOnAction(e -> AppFrames.showScene(new SellerProfilePage(username).getScene()));
+        
+        footer.getChildren().add(profileButton);
+
         Label welcomeLabel = new Label("Welcome, " + username);
         Label popularTitleLabel = new Label("Popular Products");
         GridPane popularGridPane = createGridPane();
         Label promoSaleTitleLabel = new Label("Promo Sale");
         GridPane promoSaleGridPane = createGridPane();
-        Button profileButton = new Button("Profile");
 
         displayPopularProducts(popularGridPane);
         displayDiscountedProducts(promoSaleGridPane);
-        profileButton.setOnAction(e -> AppFrames.showScene(new SellerProfilePage(username).getScene()));
 
-        layout.getChildren().addAll(new Label(), welcomeLabel, new Label(), popularTitleLabel, popularGridPane,
-                new Label(), promoSaleTitleLabel, promoSaleGridPane, new Label(), profileButton);
+        content.getChildren().addAll(new Label(), welcomeLabel, new Label(), popularTitleLabel, popularGridPane,
+                new Label(), promoSaleTitleLabel, promoSaleGridPane, new Label());
+
+        layout.getChildren().addAll(content, footer);
+
         return new Scene(layout, Global.WIDTH, Global.HEIGHT);
     }
 

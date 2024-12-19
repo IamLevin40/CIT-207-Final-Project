@@ -1,8 +1,10 @@
 package main;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.*;
 
 // for images:
@@ -140,19 +142,56 @@ class SellerLoginFrame {
         layout.setAlignment(Pos.TOP_LEFT); // Set alignment of layout to center
         layout.getStyleClass().add("login-frame"); // Add .login-frame style to layout
 
-        HBox formContainer = new HBox();
+        // welcome to
+        Label welcome = new Label("Welcome back to");
+        welcome.getStyleClass().add("text-welcome");
+        // foodai
+        Label foodai = new Label("Foodai");
+        foodai.getStyleClass().add("text-foodai_menu");
 
-        Label usernameLabel = new Label("Username:"); // Label with text "Username:"
-        TextField usernameField = new TextField(); // Text field for username
-        Label passwordLabel = new Label("Password:"); // Label with text "Password:"
-        PasswordField passwordField = new PasswordField(); // Password field for password
+        
+        Button backButton = new Button("< Back"); // Button to refer to main menu frame
+        backButton.getStyleClass().add("back-btn");
 
-        formContainer.getChildren().addAll(usernameLabel, usernameField, passwordLabel, passwordField);
+        VBox formContainer = new VBox();
         formContainer.getStyleClass().add("form-container");
 
-        Button loginButton = new Button("Login"); // Button for handling login
-        Button registerButton = new Button("Register"); // Button to refer to seller register frame
-        Button backButton = new Button("Back"); // Button to refer to main menu frame
+            Label usernameLabel = new Label("Username:");
+            usernameLabel.getStyleClass().add("labelsss");
+            TextField usernameField = new TextField();
+            usernameField.getStyleClass().add("text-field");
+
+            Label separator1 = new Label("");
+            separator1.getStyleClass().add("separator_form");
+
+            Label passwordLabel = new Label("Password:");
+            passwordLabel.getStyleClass().add("labelsss");
+            PasswordField passwordField = new PasswordField();
+            passwordField.getStyleClass().add("password-field");
+
+            Label separator2 = new Label("");
+            separator2.getStyleClass().add("separator_form");
+
+
+            Button loginButton = new Button("Login"); // Button for handling login
+            loginButton.getStyleClass().add("login-btn");
+
+
+            HBox regisContainer = new HBox();
+
+                Label regisLabel = new Label("Don't have an account yet?  ");
+                regisLabel.getStyleClass().add("regis-label");
+                Button registerButton = new Button("Register"); // Button to refer to seller register frame
+                registerButton.getStyleClass().add("register-txt");
+
+            regisContainer.getChildren().addAll(regisLabel, registerButton);
+            regisContainer.getStyleClass().add("regis-container");
+
+        formContainer.getChildren().addAll(
+                usernameLabel, usernameField, separator1,
+                         passwordLabel,passwordField, separator2,
+                         loginButton, regisContainer);
+
         Label errorLabel = new Label(); // Label for text displaying error message
         errorLabel.getStyleClass().add("error-label"); // Add .error-label style to errorLabel
 
@@ -173,8 +212,8 @@ class SellerLoginFrame {
 
         // Add components to the layout
         layout.getChildren().addAll(
-                backButton, usernameLabel, usernameField, passwordLabel, passwordField,
-                loginButton, registerButton, errorLabel);
+                welcome, foodai,
+                backButton, formContainer, errorLabel);
 
         return new Scene(layout, Global.WIDTH, Global.HEIGHT);
     }
@@ -192,20 +231,60 @@ class BuyerLoginFrame {
 
     public Scene getScene() {
         VBox layout = new VBox();
-        layout.setAlignment(Pos.CENTER);
-        layout.getStyleClass().add("login-frame");
+        layout.setAlignment(Pos.TOP_LEFT); // Set alignment of layout to center
+        layout.getStyleClass().add("login-frame"); // Add .login-frame style to layout
+
+        // welcome to
+        Label welcome = new Label("Welcome back to");
+        welcome.getStyleClass().add("text-welcome");
+        // foodai
+        Label foodai = new Label("Foodai");
+        foodai.getStyleClass().add("text-foodai_menu");
+
+        Button backButton = new Button("< Back"); // Button to refer to main menu frame
+        backButton.getStyleClass().add("back-btn");
+
+        VBox formContainer = new VBox();
+        formContainer.getStyleClass().add("form-container");
 
         Label usernameLabel = new Label("Username:");
+        usernameLabel.getStyleClass().add("labelsss");
         TextField usernameField = new TextField();
+        usernameField.getStyleClass().add("text-field");
+
+        Label separator1 = new Label("");
+        separator1.getStyleClass().add("separator_form");
+
         Label passwordLabel = new Label("Password:");
+        passwordLabel.getStyleClass().add("labelsss");
         PasswordField passwordField = new PasswordField();
+        passwordField.getStyleClass().add("password-field");
 
-        Button loginButton = new Button("Login");
-        Button registerButton = new Button("Register");
-        Button backButton = new Button("Back");
-        Label errorLabel = new Label();
-        errorLabel.getStyleClass().add("error-label");
+        Label separator2 = new Label("");
+        separator2.getStyleClass().add("separator_form");
 
+        Button loginButton = new Button("Login"); // Button for handling login
+        loginButton.getStyleClass().add("login-btn");
+
+        HBox regisContainer = new HBox();
+
+        Label regisLabel = new Label("Don't have an account yet?  ");
+        regisLabel.getStyleClass().add("regis-label");
+        Button registerButton = new Button("Register"); // Button to refer to seller register frame
+        registerButton.getStyleClass().add("register-txt");
+
+        regisContainer.getChildren().addAll(regisLabel, registerButton);
+        regisContainer.getStyleClass().add("regis-container");
+
+        formContainer.getChildren().addAll(
+                usernameLabel, usernameField, separator1,
+                passwordLabel, passwordField, separator2,
+                loginButton, regisContainer);
+
+        Label errorLabel = new Label(); // Label for text displaying error message
+        errorLabel.getStyleClass().add("error-label"); // Add .error-label style to errorLabel
+
+        // Add event listener for buttons
         loginButton.setOnAction(e -> {
             String username = usernameField.getText();
             String password = passwordField.getText();
@@ -220,12 +299,15 @@ class BuyerLoginFrame {
         registerButton.setOnAction(e -> AppFrames.showScene(new BuyerRegisterFrame(buyerService).getScene()));
         backButton.setOnAction(e -> AppFrames.showScene(new MainMenu().getScene()));
 
-        layout.getChildren().addAll(backButton, usernameLabel, usernameField, passwordLabel, passwordField,
-                registerButton, loginButton, errorLabel);
+        // Add components to the layout
+        layout.getChildren().addAll(
+                welcome, foodai,
+                backButton, formContainer, errorLabel);
 
         return new Scene(layout, Global.WIDTH, Global.HEIGHT);
     }
 }
+
 
 //
 // Register frame for seller
@@ -238,43 +320,113 @@ class SellerRegisterFrame {
     }
 
     public Scene getScene() {
-        VBox layout = new VBox();
-        layout.setAlignment(Pos.CENTER); // Set alignment of layout to center
+        VBox layout = new VBox(10);
+        layout.setAlignment(Pos.TOP_LEFT); // Set alignment of layout to center
         layout.getStyleClass().add("register-frame"); // Add .register-frame style to layout
+        layout.setPadding(new Insets(20));
 
-        Label lastNameLabel = new Label("Last Name:"); // Label with text "Last Name:"
-        TextField lastNameField = new TextField(); // Text field for last name
-        Label firstNameLabel = new Label("First Name:"); // Label with text "First Name:"
-        TextField firstNameField = new TextField(); // Text field for first name
-        Label usernameLabel = new Label("Username:"); // Label with text "Username:"
-        TextField usernameField = new TextField(); // Text field for username
-        Label passwordLabel = new Label("Password:"); // Label with text "Password:"
-        PasswordField passwordField = new PasswordField(); // Password field for password
-        Label emailLabel = new Label("Email:"); // Label with text "Email:"
-        TextField emailField = new TextField(); // Text field for email
-        Label contactNumberLabel = new Label("Contact Number: +63"); // Label with text "Contact Number: +63"
-        NumberTextField contactNumberField = new NumberTextField(10); // Number text field (custom extension of text
-                                                                      // field) for contact number
-        Label regionLabel = new Label("Region:"); // Label with text "Region:"
-        ComboBox<String> regionComboBox = new ComboBox<>(); // Combo box for region
-        Label cityLabel = new Label("City/Municipality:"); // Label with text "City/Municipality"
-        ComboBox<String> cityComboBox = new ComboBox<>(); // Combo box for city/municipality
-        Label barangayLabel = new Label("Barangay:"); // Label with text "Barangay"
-        TextField barangayField = new TextField(); // Text field for barangay
-        Label zipCodeLabel = new Label("Zip Code:"); // Label with text "Zip Code"
-        NumberTextField zipCodeField = new NumberTextField(4); // Number text field (custom extension of text field) for
-                                                               // zip code
+        Label welcome = new Label("Register your");
+        welcome.getStyleClass().add("text-welcome");
+        // foodai
+        Label foodai = new Label("Foodai");
+        foodai.getStyleClass().add("text-foodai_regis");
 
-        Label errorLabel = new Label(); // Label for text displaying error message
-        errorLabel.getStyleClass().add("error-label"); // Add .error-label style to errorLabel
+        Button backButton = new Button("< Back"); // Button to refer to main menu frame
+        backButton.getStyleClass().add("back-btn");
 
-        Button registerButton = new Button("Register"); // Button for handling register
-        Button backButton = new Button("Back"); // Button to refer to main menu frame
+        VBox registerContainer = new VBox();
+        registerContainer.getStyleClass().add("register-container");
 
-        // Populate combo boxes
-        regionComboBox.getItems().add("Select Region");
-        regionComboBox.getItems().addAll(RegionCityData.getRegions());
-        cityComboBox.setDisable(true);
+            Label lastNameLabel = new Label("Last Name:"); // Label with text "Last Name:"
+            TextField lastNameField = new TextField(); // Text field for last name
+            Label firstNameLabel = new Label("First Name:"); // Label with text "First Name:"
+            TextField firstNameField = new TextField(); // Text field for first name
+            Label usernameLabel = new Label("Username:"); // Label with text "Username:"
+            TextField usernameField = new TextField(); // Text field for username
+            Label passwordLabel = new Label("Password:"); // Label with text "Password:"
+            PasswordField passwordField = new PasswordField(); // Password field for password
+            Label emailLabel = new Label("Email:"); // Label with text "Email:"
+            TextField emailField = new TextField(); // Text field for email
+            Label contactNumberLabel = new Label("Contact Number: +63"); // Label with text "Contact Number: +63"
+            NumberTextField contactNumberField = new NumberTextField(10); // Number text field (custom extension of text field) for contact number
+                                                                        
+       
+            HBox regionZipContainer = new HBox(10);
+            
+
+                // Left side
+                VBox regionBox = new VBox(5);
+                Label regionLabel = new Label("Region:");
+                ComboBox<String> regionComboBox = new ComboBox<>();
+                regionBox.getChildren().addAll(regionLabel, regionComboBox);
+
+                // Right side
+                VBox zipBox = new VBox(5);
+                Label zipCodeLabel = new Label("Zip Code:");
+                NumberTextField zipCodeField = new NumberTextField(4);
+                zipBox.getChildren().addAll(zipCodeLabel, zipCodeField);
+
+                // Set preferred widths for consistent sizing
+                regionComboBox.setPrefWidth(150);
+                zipCodeField.setPrefWidth(150);
+
+            regionZipContainer.getChildren().addAll(regionBox, zipBox);
+
+            
+            Label barangayLabel = new Label("Barangay:"); // Label with text "Barangay"
+            TextField barangayField = new TextField();
+            
+            Label cityLabel = new Label("City/Municipality:"); // Label with text "City/Municipality"
+            ComboBox<String> cityComboBox = new ComboBox<>(); // Combo box for city/municipality
+        
+        
+            // Populate combo boxes
+            regionComboBox.getItems().add("Select Region");
+            regionComboBox.getItems().addAll(RegionCityData.getRegions());
+            cityComboBox.setDisable(true);
+        
+
+            Button registerButton = new Button("Register"); // Button for handling register
+            registerButton.getStyleClass().addAll("register-btn");
+
+            Label errorLabel = new Label(); // Label for text displaying error message
+            errorLabel.getStyleClass().add("error-label"); // Add .error-label style to errorLabel
+
+            lastNameLabel.getStyleClass().add("labelsss");
+            firstNameLabel.getStyleClass().add("labelsss");
+            usernameLabel.getStyleClass().add("labelsss");
+            passwordLabel.getStyleClass().add("labelsss");
+            emailLabel.getStyleClass().add("labelsss");
+            contactNumberLabel.getStyleClass().add("labelsss");
+            regionLabel.getStyleClass().add("labelsss");
+            zipCodeLabel.getStyleClass().add("labelsss");
+            barangayLabel.getStyleClass().add("labelsss");
+            cityLabel.getStyleClass().add("labelsss");
+
+            lastNameField.getStyleClass().add("fieldsss");
+            firstNameField.getStyleClass().add("fieldsss");
+            usernameField.getStyleClass().add("fieldsss");
+            passwordField.getStyleClass().add("fieldsss");
+            emailField.getStyleClass().add("fieldsss");
+            contactNumberField.getStyleClass().add("fieldsss");
+            regionComboBox.getStyleClass().add("fieldsss");
+            zipCodeField.getStyleClass().add("fieldsss");
+            cityComboBox.getStyleClass().add("fieldsss");
+            barangayField.getStyleClass().add("fieldsss");
+
+        registerContainer.getChildren().addAll(
+                lastNameLabel, lastNameField,
+                firstNameLabel, firstNameField, 
+                usernameLabel, usernameField, 
+                passwordLabel, passwordField,
+                emailLabel, emailField,
+                contactNumberLabel, contactNumberField,
+                regionZipContainer,
+                barangayLabel, barangayField,
+                cityLabel, cityComboBox,
+                registerButton,
+                errorLabel);
+        
 
         regionComboBox.setOnAction(e -> {
             String selectedRegion = regionComboBox.getValue();
@@ -310,13 +462,21 @@ class SellerRegisterFrame {
         });
         backButton.setOnAction(e -> AppFrames.showScene(new SellerLoginFrame(sellerService).getScene()));
 
-        // Add components to the layout
-        layout.getChildren().addAll(lastNameLabel, lastNameField, firstNameLabel, firstNameField, usernameLabel,
-                usernameField, passwordLabel, passwordField, emailLabel, emailField, contactNumberLabel,
-                contactNumberField, regionLabel, regionComboBox, cityLabel, cityComboBox, barangayLabel, barangayField,
-                zipCodeLabel, zipCodeField, errorLabel, registerButton, backButton);
 
-        return new Scene(layout, Global.WIDTH, Global.HEIGHT);
+
+        // Add components to the layout
+        layout.getChildren().addAll(welcome, foodai,backButton, registerContainer);
+
+        ScrollPane scrollPane = new ScrollPane(layout);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS); // Always show vertical scrollbar
+        scrollPane.setPrefViewportHeight(Global.HEIGHT);
+        
+        // Set minimum sizes to ensure scrolling works
+        layout.setMinHeight(Region.USE_PREF_SIZE);
+        layout.setPrefWidth(Global.WIDTH - 20); // Account for scrollbar width
+    
+        return new Scene(scrollPane, Global.WIDTH, Global.HEIGHT);
     }
 }
 
@@ -331,10 +491,23 @@ class BuyerRegisterFrame {
     }
 
     public Scene getScene() {
-        VBox layout = new VBox();
-        layout.setAlignment(Pos.CENTER);
+        VBox layout = new VBox(10);
+        layout.setAlignment(Pos.TOP_LEFT);
         layout.getStyleClass().add("register-frame");
+        layout.setPadding(new Insets(20));
 
+        Label welcome = new Label("Register your");
+        welcome.getStyleClass().add("text-welcome");
+        Label foodai = new Label("Foodai");
+        foodai.getStyleClass().add("text-foodai_regis");
+
+        Button backButton = new Button("< Back");
+        backButton.getStyleClass().add("back-btn");
+
+        VBox registerContainer = new VBox();
+        registerContainer.getStyleClass().add("register-container");
+
+        // Form fields
         Label orgNameLabel = new Label("Organization Name:");
         TextField orgNameField = new TextField();
         Label usernameLabel = new Label("Username:");
@@ -345,24 +518,79 @@ class BuyerRegisterFrame {
         TextField emailField = new TextField();
         Label contactNumberLabel = new Label("Contact Number: +63");
         NumberTextField contactNumberField = new NumberTextField(10);
+
+        // Region and Zip container
+        HBox regionZipContainer = new HBox(10);
+        
+        VBox regionBox = new VBox(5);
         Label regionLabel = new Label("Region:");
         ComboBox<String> regionComboBox = new ComboBox<>();
-        regionComboBox.getItems().add("Select Region");
-        regionComboBox.getItems().addAll(RegionCityData.getRegions());
-        Label cityLabel = new Label("City/Municipality:");
-        ComboBox<String> cityComboBox = new ComboBox<>();
-        cityComboBox.setDisable(true);
-        Label barangayLabel = new Label("Barangay:");
-        TextField barangayField = new TextField();
+        regionBox.getChildren().addAll(regionLabel, regionComboBox);
+
+        VBox zipBox = new VBox(5);
         Label zipCodeLabel = new Label("Zip Code:");
         NumberTextField zipCodeField = new NumberTextField(4);
+        zipBox.getChildren().addAll(zipCodeLabel, zipCodeField);
+
+        regionComboBox.setPrefWidth(150);
+        zipCodeField.setPrefWidth(150);
+
+        regionZipContainer.getChildren().addAll(regionBox, zipBox);
+
+        Label barangayLabel = new Label("Barangay:");
+        TextField barangayField = new TextField();
+        
+        Label cityLabel = new Label("City/Municipality:");
+        ComboBox<String> cityComboBox = new ComboBox<>();
+        
+        // Populate combo boxes
+        regionComboBox.getItems().add("Select Region");
+        regionComboBox.getItems().addAll(RegionCityData.getRegions());
+        cityComboBox.setDisable(true);
+
+        Button registerButton = new Button("Register");
+        registerButton.getStyleClass().add("register-btn");
 
         Label errorLabel = new Label();
         errorLabel.getStyleClass().add("error-label");
 
-        Button registerButton = new Button("Register");
-        Button backButton = new Button("Back");
+        // Add styles to labels
+        orgNameLabel.getStyleClass().add("labelsss");
+        usernameLabel.getStyleClass().add("labelsss");
+        passwordLabel.getStyleClass().add("labelsss");
+        emailLabel.getStyleClass().add("labelsss");
+        contactNumberLabel.getStyleClass().add("labelsss");
+        regionLabel.getStyleClass().add("labelsss");
+        zipCodeLabel.getStyleClass().add("labelsss");
+        barangayLabel.getStyleClass().add("labelsss");
+        cityLabel.getStyleClass().add("labelsss");
 
+        // Add styles to fields
+        orgNameField.getStyleClass().add("fieldsss");
+        usernameField.getStyleClass().add("fieldsss");
+        passwordField.getStyleClass().add("fieldsss");
+        emailField.getStyleClass().add("fieldsss");
+        contactNumberField.getStyleClass().add("fieldsss");
+        regionComboBox.getStyleClass().add("fieldsss");
+        zipCodeField.getStyleClass().add("fieldsss");
+        cityComboBox.getStyleClass().add("fieldsss");
+        barangayField.getStyleClass().add("fieldsss");
+
+        // Add components to register container
+        registerContainer.getChildren().addAll(
+            orgNameLabel, orgNameField,
+            usernameLabel, usernameField,
+            passwordLabel, passwordField,
+            emailLabel, emailField,
+            contactNumberLabel, contactNumberField,
+            regionZipContainer,
+            barangayLabel, barangayField,
+            cityLabel, cityComboBox,
+            registerButton,
+            errorLabel
+        );
+
+        // Keep existing event handlers
         regionComboBox.setOnAction(e -> {
             String selectedRegion = regionComboBox.getValue();
             cityComboBox.getItems().clear();
@@ -396,11 +624,18 @@ class BuyerRegisterFrame {
 
         backButton.setOnAction(e -> AppFrames.showScene(new BuyerLoginFrame(buyerService).getScene()));
 
-        layout.getChildren().addAll(orgNameLabel, orgNameField, usernameLabel, usernameField, passwordLabel,
-                passwordField, emailLabel, emailField, contactNumberLabel, contactNumberField, regionLabel,
-                regionComboBox, cityLabel, cityComboBox, barangayLabel, barangayField, zipCodeLabel, zipCodeField,
-                errorLabel, registerButton, backButton);
+        // Add components to main layout
+        layout.getChildren().addAll(welcome, foodai, backButton, registerContainer);
 
-        return new Scene(layout, Global.WIDTH, Global.HEIGHT);
+        // Add ScrollPane
+        ScrollPane scrollPane = new ScrollPane(layout);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+        scrollPane.setPrefViewportHeight(Global.HEIGHT);
+        
+        layout.setMinHeight(Region.USE_PREF_SIZE);
+        layout.setPrefWidth(Global.WIDTH - 20);
+    
+        return new Scene(scrollPane, Global.WIDTH, Global.HEIGHT);
     }
 }
