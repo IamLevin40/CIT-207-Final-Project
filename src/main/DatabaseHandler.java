@@ -169,24 +169,25 @@ public interface DatabaseHandler {
         }
         return row;
     }
+
+    boolean registerUser(Map<String, String> userDetails);
 }
 
 class SellerDatabaseHandler implements DatabaseHandler {
-    public boolean registerSeller(String username, String lastName, String firstName, String password, String email,
-            String contactNumber, String region, String cityOrMunicipality, String barangay, String zipCode) {
+    public boolean registerUser(Map<String, String> userDetails) {
         String query = "INSERT INTO " + Global.SELLER_TABLE_NAME
                 + " (username, last_name, first_name, password, email, contact_number, region, city_or_municipality, barangay, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, username);
-            stmt.setString(2, lastName);
-            stmt.setString(3, firstName);
-            stmt.setString(4, password);
-            stmt.setString(5, email);
-            stmt.setString(6, contactNumber);
-            stmt.setString(7, region);
-            stmt.setString(8, cityOrMunicipality);
-            stmt.setString(9, barangay);
-            stmt.setString(10, zipCode);
+            stmt.setString(1, userDetails.get("username"));
+            stmt.setString(2, userDetails.get("last_name"));
+            stmt.setString(3, userDetails.get("first_name"));
+            stmt.setString(4, userDetails.get("password"));
+            stmt.setString(5, userDetails.get("email"));
+            stmt.setString(6, userDetails.get("contact_number"));
+            stmt.setString(7, userDetails.get("region"));
+            stmt.setString(8, userDetails.get("city_or_municipality"));
+            stmt.setString(9, userDetails.get("barangay"));
+            stmt.setString(10, userDetails.get("zip_code"));
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -206,20 +207,19 @@ class SellerDatabaseHandler implements DatabaseHandler {
 }
 
 class BuyerDatabaseHandler implements DatabaseHandler {
-    public boolean registerBuyer(String username, String oeganizationName, String password, String email,
-            String contactNumber, String region, String cityOrMunicipality, String barangay, String zipCode) {
+    public boolean registerUser(Map<String, String> userDetails) {
         String query = "INSERT INTO " + Global.BUYER_TABLE_NAME
                 + " (username, organization_name, password, email, contact_number, region, city_or_municipality, barangay, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = connect(); PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, username);
-            stmt.setString(2, oeganizationName);
-            stmt.setString(3, password);
-            stmt.setString(4, email);
-            stmt.setString(5, contactNumber);
-            stmt.setString(6, region);
-            stmt.setString(7, cityOrMunicipality);
-            stmt.setString(8, barangay);
-            stmt.setString(9, zipCode);
+            stmt.setString(1, userDetails.get("username"));
+            stmt.setString(2, userDetails.get("organization_name"));
+            stmt.setString(3, userDetails.get("password"));
+            stmt.setString(4, userDetails.get("email"));
+            stmt.setString(5, userDetails.get("contact_number"));
+            stmt.setString(6, userDetails.get("region"));
+            stmt.setString(7, userDetails.get("city_or_municipality"));
+            stmt.setString(8, userDetails.get("barangay"));
+            stmt.setString(9, userDetails.get("zip_code"));
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -372,5 +372,10 @@ class ProductDatabaseHandler implements DatabaseHandler {
             int offset = limit * (page - 1);
             return executeReadQuery(query, new Object[] { sellerId, limit, offset });
         }
+    }
+
+    @Override
+    public boolean registerUser(Map<String, String> userDetails) {
+        throw new UnsupportedOperationException("Unimplemented method 'registerUser'");
     }
 }
