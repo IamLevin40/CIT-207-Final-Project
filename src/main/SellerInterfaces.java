@@ -39,65 +39,62 @@ class SellerHomePage {
     }
 
     public Scene getScene() {
-    BorderPane borderPane = new BorderPane();
-    
-    // Content container
-    VBox content = new VBox(10);
-    content.setAlignment(Pos.TOP_CENTER);
-    content.getStyleClass().add("product-frame");
-    
-    // Add spacer to push content up
-    Region spacer = new Region();
-    VBox.setVgrow(spacer, Priority.ALWAYS);
-    
-    // Create footer
-    HBox footer = new HBox();
-    footer.setAlignment(Pos.CENTER);
-    footer.setPadding(new Insets(10));
-    footer.getStyleClass().add("footer-css");
-    footer.setMinHeight(50);
-    
-    Button profileButton = new Button("");
-    profileButton.setOnAction(e -> AppFrames.showScene(new SellerProfilePage(username).getScene()));
-    profileButton.getStyleClass().add("profile-btn");
-    
+        BorderPane borderPane = new BorderPane();
 
-    Label welcomeLabel = new Label("Welcome, " + username);
-    Label popularTitleLabel = new Label("Popular Products");
-    GridPane popularGridPane = createGridPane();
-    Label promoSaleTitleLabel = new Label("Promo Sale");
-    GridPane promoSaleGridPane = createGridPane();
+        // Content container
+        VBox content = new VBox(10);
+        content.setAlignment(Pos.TOP_CENTER);
+        content.getStyleClass().add("product-frame");
 
-    displayPopularProducts(popularGridPane);
-    displayDiscountedProducts(promoSaleGridPane);
+        // Add spacer to push content up
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
 
-    
-    content.getChildren().addAll(
-        welcomeLabel, 
-        popularTitleLabel, 
-        popularGridPane,
-        promoSaleTitleLabel, 
-        promoSaleGridPane,
-        spacer
-    );
+        // Create footer
+        HBox footer = new HBox();
+        footer.setAlignment(Pos.CENTER);
+        footer.setPadding(new Insets(10));
+        footer.getStyleClass().add("footer-css");
+        footer.setMinHeight(50);
 
-    // in HOME: so should not do anything. Give ACTIVE status style
-    Button homeBtn = new Button("");
-    homeBtn.getStyleClass().add("home-btn-active");
+        Button profileButton = new Button("");
+        profileButton.setOnAction(e -> AppFrames.showScene(new SellerProfilePage(username).getScene()));
+        profileButton.getStyleClass().add("profile-btn");
 
-    Button addBtn = new Button("");
-    addBtn.setOnAction(e -> AppFrames.showScene(new SellerShopPage(username).getScene()));
-    addBtn.getStyleClass().add("add-btn");
+        Label welcomeLabel = new Label("Welcome, " + username);
+        Label popularTitleLabel = new Label("Popular Products");
+        GridPane popularGridPane = createGridPane();
+        Label promoSaleTitleLabel = new Label("Promo Sale");
+        GridPane promoSaleGridPane = createGridPane();
 
-    // FOOTER ORDER
-    footer.getChildren().addAll(homeBtn, addBtn, profileButton);
+        displayPopularProducts(popularGridPane);
+        displayDiscountedProducts(promoSaleGridPane);
 
-    // Set BorderPane sections
-    borderPane.setCenter(content);
-    borderPane.setBottom(footer);
+        content.getChildren().addAll(
+                welcomeLabel,
+                popularTitleLabel,
+                popularGridPane,
+                promoSaleTitleLabel,
+                promoSaleGridPane,
+                spacer);
 
-    return new Scene(borderPane, Global.WIDTH, Global.HEIGHT);
-}
+        // in HOME: so should not do anything. Give ACTIVE status style
+        Button homeBtn = new Button("");
+        homeBtn.getStyleClass().add("home-btn-active");
+
+        Button addBtn = new Button("");
+        addBtn.setOnAction(e -> AppFrames.showScene(new SellerShopPage(username).getScene()));
+        addBtn.getStyleClass().add("add-btn");
+
+        // FOOTER ORDER
+        footer.getChildren().addAll(homeBtn, addBtn, profileButton);
+
+        // Set BorderPane sections
+        borderPane.setCenter(content);
+        borderPane.setBottom(footer);
+
+        return new Scene(borderPane, Global.WIDTH, Global.HEIGHT);
+    }
 
     private void displayPopularProducts(GridPane gridPane) {
         gridPane.getChildren().clear();
@@ -216,7 +213,8 @@ class SellerProfilePage {
         backButton.setOnAction(e -> AppFrames.showScene(new SellerHomePage(username).getScene()));
         logOutButton.setOnAction(e -> AppFrames.showScene(new MainMenu().getScene()));
 
-        content.getChildren().addAll(backButton, profileLabel, new Label(), welcomeLabel, shopPageButton, logOutButton, spacer);
+        content.getChildren().addAll(backButton, profileLabel, new Label(), welcomeLabel, shopPageButton, logOutButton,
+                spacer);
 
         // Create footer
         HBox footer = new HBox();
@@ -224,10 +222,11 @@ class SellerProfilePage {
         footer.setPadding(new Insets(10));
         footer.getStyleClass().add("footer-css");
         footer.setMinHeight(50);
-        
+
         // in Profile: so should not do anything. Give ACTIVE status style
         Button profileButton = new Button("Profile");
-        // profileButton.setOnAction(e -> AppFrames.showScene(new SellerProfilePage(username).getScene()));
+        // profileButton.setOnAction(e -> AppFrames.showScene(new
+        // SellerProfilePage(username).getScene()));
         // footer.getChildren().add(profileButton);
 
         // backButton is HOME
@@ -365,7 +364,6 @@ class SellerAddProductPage {
         Button addProductButton = new Button("Add Product");
         Label errorLabel = new Label();
 
-        File[] selectedImage = { null };
         imageView.setFitWidth(200);
         imageView.setFitHeight(200);
         imageUploadBox.setAlignment(Pos.CENTER);
@@ -424,7 +422,7 @@ class SellerAddProductPage {
             boolean isPopular = false;
 
             try {
-                productCreate.addFoodbank(cropId, quantity, price, discount, isPopular, selectedImage[0], username,
+                productCreate.addFoodbank(cropId, quantity, price, discount, isPopular, selectedImageFile, username,
                         errorLabel, new ProductService.Callback() {
                             @Override
                             public void onSuccess() {

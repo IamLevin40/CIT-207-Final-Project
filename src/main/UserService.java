@@ -28,9 +28,17 @@ public interface UserService {
     default void handleRegistration(Map<String, String> userDetails, Label errorLabel, RegisterCallback callback) {
         Map<String, Integer> columnLengths = getDatabaseHandler().getColumnMaxLengths(getUserTable());
 
-        List<String> validationOrder = List.of(
-                "last_name", "first_name", "username", "password", "email",
-                "contact_number", "region", "city_or_municipality", "barangay", "zip_code");
+        List<String> validationOrder;
+
+        if (getUserTable() == "Seller") {
+            validationOrder = List.of(
+                    "last_name", "first_name", "username", "password", "email",
+                    "contact_number", "region", "city_or_municipality", "barangay", "zip_code");
+        } else {
+            validationOrder = List.of(
+                    "organization_name", "username", "password", "email",
+                    "contact_number", "region", "city_or_municipality", "barangay", "zip_code");
+        }
 
         for (String field : validationOrder) {
             String value = userDetails.get(field);
