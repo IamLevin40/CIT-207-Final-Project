@@ -180,6 +180,25 @@ public interface ProductService {
             this.dbHandler = new ProductDatabaseHandler();
         }
 
+        public void updateQuantity(int id, String quantity, Label errorLabel, Callback callback) {
+            if (!validateAndSetError(validateHasCharacters("id", Integer.toString(id)), errorLabel))
+                return;
+            if (!validateAndSetError(validateOnlyFloatDigitCharacters("id", Integer.toString(id)), errorLabel))
+                return;
+            if (!validateAndSetError(validateHasCharacters("quantity", quantity), errorLabel))
+                return;
+            if (!validateAndSetError(validateOnlyFloatDigitCharacters("quantity", quantity),
+                    errorLabel))
+                return;
+
+            if (dbHandler.updateQuantity(id, Double.parseDouble(quantity))) {
+                System.out.println("Product data updating successful.");
+                callback.onSuccess();
+            } else {
+                displayErrorMessage("Product data updating failed.", errorLabel);
+            }
+        }
+
         public void updateQuantityPriceImage(int id, String quantity, String price, File image, Label errorLabel,
                 Callback callback) throws NumberFormatException, FileNotFoundException {
             if (!validateAndSetError(validateHasCharacters("id", Integer.toString(id)), errorLabel))
